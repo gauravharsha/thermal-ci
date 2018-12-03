@@ -1,2 +1,2 @@
-# thermal_pt
+# thermal-pt
 Thermofield formulation of Perturbation Theory
