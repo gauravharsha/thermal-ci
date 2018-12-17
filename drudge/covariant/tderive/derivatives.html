@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Covariant Derivatives</title>
+
+    <!-- MathJAX intialization -->
+    <script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			"HTML-CSS": { linebreaks: { automatic: true } },
+			SVG: { linebreaks: { automatic: true } }
+		});
+	</script>
+	<script type="text/javascript"
+		src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
+
+    <!-- Boostrap initialization -->
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1>Covariant Derivatives</h1>
+    </div>
+
+    <div class="row">
+        <!-- The main content -->
+        <div class="col-sm-9 col-lg-10">
+            <div class="page-header" id="sect-1">
+                <h2>Tvec</h2>
+            </div>
+            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-2">
+                <h2>Svec</h2>
+            </div>
+            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} s^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} s^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{1}{36} s^{(3)}_{a,b,c,d,i,j}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \uparrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{\dagger}_{j, \downarrow} \]</p>
+            <div class="page-header" id="sect-3">
+                <h2>dT_dBeta</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \frac{\mu}{2} x_{b}  y_{b}  t^{(1)}_{b,a}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L}  \frac{1}{2} e^{(0)}_{b}  x_{b}  y_{b}  t^{(1)}_{b,a}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \frac{\mu}{2} x_{b}  y_{b}  t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow} - \sum_{a \in L} \sum_{b \in L}  \frac{1}{2} e^{(0)}_{b}  x_{b}  y_{b}  t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} e^{(0)}_{d}  x_{d}  y_{d}  t^{(2)}_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{\mu}{4} x_{d}  y_{d}  t^{(2)}_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{\mu}{4} x_{d}  y_{d}  t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} e^{(0)}_{d}  x_{d}  y_{d}  t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \frac{1}{2} e^{(0)}_{c}  x_{c}  y_{c}  t^{(2)}_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L}  \frac{\mu}{2} x_{c}  y_{c}  t^{(2)}_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow}  + \sum_{a \in L} \frac{1}{2} e^{(0)}_{a}  x_{a}  y_{a}  t^{(1)}_{a,a}  - \sum_{a \in L}  \frac{\mu}{2} x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
+            <div class="page-header" id="sect-4">
+                <h2>dS_dBeta</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \frac{\mu}{2} x_{b}  y_{b}  s^{(1)}_{b,a}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L}  \frac{1}{2} e^{(0)}_{b}  x_{b}  y_{b}  s^{(1)}_{b,a}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \frac{\mu}{2} x_{b}  y_{b}  s^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow} - \sum_{a \in L} \sum_{b \in L}  \frac{1}{2} e^{(0)}_{b}  x_{b}  y_{b}  s^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} e^{(0)}_{d}  x_{d}  y_{d}  s^{(2)}_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{\mu}{4} x_{d}  y_{d}  s^{(2)}_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{\mu}{4} x_{d}  y_{d}  s^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} e^{(0)}_{d}  x_{d}  y_{d}  s^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L}  \frac{1}{4} e^{(0)}_{i}  x_{i}  y_{i}  s^{(3)}_{a,b,i,c,d,i}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{\mu}{4} x_{i}  y_{i}  s^{(3)}_{a,b,i,c,d,i}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \frac{1}{2} e^{(0)}_{c}  x_{c}  y_{c}  s^{(2)}_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L}  \frac{\mu}{2} x_{c}  y_{c}  s^{(2)}_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{\mu}{12} x_{j}  y_{j}  s^{(3)}_{a,b,j,c,d,i}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{}_{j, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{12} e^{(0)}_{j}  x_{j}  y_{j}  s^{(3)}_{a,b,j,c,d,i}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{}_{j, \downarrow}  + \sum_{a \in L} \frac{1}{2} e^{(0)}_{a}  x_{a}  y_{a}  s^{(1)}_{a,a}  - \sum_{a \in L}  \frac{\mu}{2} x_{a}  y_{a}  s^{(1)}_{a,a}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{\mu}{12} x_{j}  y_{j}  s^{(3)}_{a,b,c,d,i,j}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \uparrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{}_{j, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{12} e^{(0)}_{j}  x_{j}  y_{j}  s^{(3)}_{a,b,c,d,i,j}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \uparrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{}_{j, \uparrow} \]</p>
+            <div class="page-header" id="sect-5">
+                <h2>dT_dMu</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \frac{\beta}{2} x_{b}  y_{b}  t^{(1)}_{b,a}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \frac{\beta}{2} x_{b}  y_{b}  t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{\beta}{4} x_{d}  y_{d}  t^{(2)}_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{\beta}{4} x_{d}  y_{d}  t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L}  \frac{\beta}{2} x_{c}  y_{c}  t^{(2)}_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} - \sum_{a \in L}  \frac{\beta}{2} x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
+            <div class="page-header" id="sect-6">
+                <h2>dS_dMu</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \frac{\beta}{2} x_{b}  y_{b}  s^{(1)}_{b,a}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \frac{\beta}{2} x_{b}  y_{b}  s^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{\beta}{4} x_{d}  y_{d}  s^{(2)}_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{\beta}{4} x_{d}  y_{d}  s^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{\beta}{4} x_{i}  y_{i}  s^{(3)}_{a,b,i,c,d,i}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L}  \frac{\beta}{2} x_{c}  y_{c}  s^{(2)}_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{\beta}{12} x_{j}  y_{j}  s^{(3)}_{a,b,j,c,d,i}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{}_{j, \downarrow} - \sum_{a \in L}  \frac{\beta}{2} x_{a}  y_{a}  s^{(1)}_{a,a}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{\beta}{12} x_{j}  y_{j}  s^{(3)}_{a,b,c,d,i,j}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \uparrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{}_{j, \uparrow} \]</p>
+            <div class="page-header" id="sect-7">
+                <h2>dT_dBeta_1body</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \frac{1}{2} e^{(0)}_{a}  x_{a}  y_{a}  t^{(2)}_{a,p,a,q}  - \sum_{a \in L}  \frac{\mu}{2} x_{a}  y_{a}  t^{(2)}_{a,p,a,q}  \]</p>
+            <div class="page-header" id="sect-8">
+                <h2>dT_dBeta_2body</h2>
+            </div>
+            <p>\[ 0 \]</p>
+            <div class="page-header" id="sect-9">
+                <h2>dS_dBeta_1body</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \frac{1}{2} e^{(0)}_{a}  x_{a}  y_{a}  s^{(2)}_{a,p,a,q}  - \sum_{a \in L}  \frac{\mu}{2} x_{a}  y_{a}  s^{(2)}_{a,p,a,q}  \]</p>
+            <div class="page-header" id="sect-10">
+                <h2>dS_dBeta_2body</h2>
+            </div>
+            <p>\[ 0 \]</p>
+            <div class="page-header" id="sect-11">
+                <h2>dS_dBeta_3body</h2>
+            </div>
+            <p>\[ 0 \]</p>
+            <div class="page-header" id="sect-12">
+                <h2>dT_dMu_1body</h2>
+            </div>
+            <p>\[ - \sum_{a \in L}  \frac{\beta}{2} x_{a}  y_{a}  t^{(2)}_{a,p,a,q}  \]</p>
+            <div class="page-header" id="sect-13">
+                <h2>dT_dMu_2body</h2>
+            </div>
+            <p>\[ 0 \]</p>
+            <div class="page-header" id="sect-14">
+                <h2>dS_dMu_1body</h2>
+            </div>
+            <p>\[ - \sum_{a \in L}  \frac{\beta}{2} x_{a}  y_{a}  s^{(2)}_{a,p,a,q}  \]</p>
+            <div class="page-header" id="sect-15">
+                <h2>dS_dMu_2body</h2>
+            </div>
+            <p>\[ 0 \]</p>
+            <div class="page-header" id="sect-16">
+                <h2>dS_dMu_3body</h2>
+            </div>
+            <p>\[ 0 \]</p>
+        </div>
+
+        <!-- The navigation -->
+        <div class="col-sm-3 col-lg-2">
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active"><a href="#sect-1">Tvec</a></li>
+                <li ><a href="#sect-2">Svec</a></li>
+                <li ><a href="#sect-3">dT_dBeta</a></li>
+                <li ><a href="#sect-4">dS_dBeta</a></li>
+                <li ><a href="#sect-5">dT_dMu</a></li>
+                <li ><a href="#sect-6">dS_dMu</a></li>
+                <li ><a href="#sect-7">dT_dBeta_1body</a></li>
+                <li ><a href="#sect-8">dT_dBeta_2body</a></li>
+                <li ><a href="#sect-9">dS_dBeta_1body</a></li>
+                <li ><a href="#sect-10">dS_dBeta_2body</a></li>
+                <li ><a href="#sect-11">dS_dBeta_3body</a></li>
+                <li ><a href="#sect-12">dT_dMu_1body</a></li>
+                <li ><a href="#sect-13">dT_dMu_2body</a></li>
+                <li ><a href="#sect-14">dS_dMu_1body</a></li>
+                <li ><a href="#sect-15">dS_dMu_2body</a></li>
+                <li ><a href="#sect-16">dS_dMu_3body</a></li>
+            </ul>
+        </div>
+    </div> <!-- end the main row -->
+
+    <!-- The footer -->
+    <div class="row">
+        <footer class="footer">
+            <p class="small text-center">Automatically generated by drudge symbolic algebra system.</p>
+            <p class="small text-center">By Jinmo Zhao and Gustavo E Scuseria, Rice Univ, Houston, TX, USA</p>
+        </footer>
+    </div>
+</div> <!-- end the main fluid container -->
+</body>
+</html>

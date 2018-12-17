@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thermal Perturbation Theory</title>
+
+    <!-- MathJAX intialization -->
+    <script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			"HTML-CSS": { linebreaks: { automatic: true } },
+			SVG: { linebreaks: { automatic: true } }
+		});
+	</script>
+	<script type="text/javascript"
+		src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
+
+    <!-- Boostrap initialization -->
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1>Thermal Perturbation Theory</h1>
+    </div>
+
+    <div class="row">
+        <!-- The main content -->
+        <div class="col-sm-9 col-lg-10">
+            <div class="page-header" id="sect-1">
+                <h2>Full Hamiltonian</h2>
+            </div>
+            <p>\[ \sum_{a \in L}  d^{\dagger}_{a} d^{}_{a} \]</p>
+            <div class="page-header" id="sect-2">
+                <h2>Thermal Ham</h2>
+            </div>
+            <p>\[ \sum_{a \in L} y_{a}^{2}   + \sum_{a \in L} x_{a}^{2}    c^{\dagger}_{a, \uparrow} c^{}_{a, \uparrow}  + \sum_{a \in L} x_{a}  y_{a}    c^{}_{a, \downarrow} c^{}_{a, \uparrow}  + \sum_{a \in L} x_{a}  y_{a}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{a, \downarrow} - \sum_{a \in L} y_{a}^{2}    c^{\dagger}_{a, \downarrow} c^{}_{a, \downarrow} \]</p>
+            <div class="page-header" id="sect-3">
+                <h2>Tvec</h2>
+            </div>
+            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-4">
+                <h2>Svec</h2>
+            </div>
+            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{1}{36} s^{(3)}_{a,b,c,d,i,j}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \uparrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{\dagger}_{j, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} s^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} s^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-5">
+                <h2>The Spin Rep for Tilde and non Tilde</h2>
+            </div>
+            <p>\[  c^{}_{a, \uparrow}  +  c^{}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-6">
+                <h2>MP1 1 body eqn</h2>
+            </div>
+            <p>\[ \delta_{a p} x_{a}  y_{a}  \]</p>
+            <div class="page-header" id="sect-7">
+                <h2>MP1 2 body eqn</h2>
+            </div>
+            <p>\[ 0 \]</p>
+            <div class="page-header" id="sect-8">
+                <h2>MP2 1 body eqn</h2>
+            </div>
+            <p>\[ x_{p}^{2}  t^{(1)}_{p,a}  - y_{a}^{2}  t^{(1)}_{p,a}   + \sum_{b \in L} y_{b}^{2}  t^{(1)}_{p,a}  - \sum_{b \in L} x_{b}  y_{b}  t^{(2)}_{b,p,a,b}  \]</p>
+            <div class="page-header" id="sect-9">
+                <h2>MP2 2 body eqn</h2>
+            </div>
+            <p>\[ x_{p}^{2}  t^{(2)}_{p,q,a,b}   + x_{q}^{2}  t^{(2)}_{p,q,a,b}  - y_{a}^{2}  t^{(2)}_{p,q,a,b}  - y_{b}^{2}  t^{(2)}_{p,q,a,b}   + \delta_{a p} x_{a}  y_{a}  t^{(1)}_{q,b}   + \delta_{b q} x_{b}  y_{b}  t^{(1)}_{p,a}  -  \delta_{a q} x_{a}  y_{a}  t^{(1)}_{p,b}  -  \delta_{b p} x_{b}  y_{b}  t^{(1)}_{q,a}   + \sum_{c \in L} y_{c}^{2}  t^{(2)}_{p,q,a,b}  \]</p>
+            <div class="page-header" id="sect-10">
+                <h2>MP2 3 body eqn</h2>
+            </div>
+            <p>\[ 0 \]</p>
+            <div class="page-header" id="sect-11">
+                <h2>Tdag1 * T</h2>
+            </div>
+            <p>\[ t^{(1)}_{p,a}  \]</p>
+            <div class="page-header" id="sect-12">
+                <h2>Tdag2 * T</h2>
+            </div>
+            <p>\[ t^{(2)}_{p,q,a,b}  \]</p>
+            <div class="page-header" id="sect-13">
+                <h2>Sdag1 * S</h2>
+            </div>
+            <p>\[ s^{(1)}_{p,a}  \]</p>
+            <div class="page-header" id="sect-14">
+                <h2>Sdag2 * S</h2>
+            </div>
+            <p>\[ s^{(2)}_{p,q,a,b}  \]</p>
+            <div class="page-header" id="sect-15">
+                <h2>Sdag3 * S</h2>
+            </div>
+            <p>\[ s^{(1)}_{p,a}  \]</p>
+            <div class="page-header" id="sect-16">
+                <h2>Symm Check</h2>
+            </div>
+            <p>\[ 0 \]</p>
+        </div>
+
+        <!-- The navigation -->
+        <div class="col-sm-3 col-lg-2">
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active"><a href="#sect-1">Full Hamiltonian</a></li>
+                <li ><a href="#sect-2">Thermal Ham</a></li>
+                <li ><a href="#sect-3">Tvec</a></li>
+                <li ><a href="#sect-4">Svec</a></li>
+                <li ><a href="#sect-5">The Spin Rep for Tilde and non Tilde</a></li>
+                <li ><a href="#sect-6">MP1 1 body eqn</a></li>
+                <li ><a href="#sect-7">MP1 2 body eqn</a></li>
+                <li ><a href="#sect-8">MP2 1 body eqn</a></li>
+                <li ><a href="#sect-9">MP2 2 body eqn</a></li>
+                <li ><a href="#sect-10">MP2 3 body eqn</a></li>
+                <li ><a href="#sect-11">Tdag1 * T</a></li>
+                <li ><a href="#sect-12">Tdag2 * T</a></li>
+                <li ><a href="#sect-13">Sdag1 * S</a></li>
+                <li ><a href="#sect-14">Sdag2 * S</a></li>
+                <li ><a href="#sect-15">Sdag3 * S</a></li>
+                <li ><a href="#sect-16">Symm Check</a></li>
+            </ul>
+        </div>
+    </div> <!-- end the main row -->
+
+    <!-- The footer -->
+    <div class="row">
+        <footer class="footer">
+            <p class="small text-center">Automatically generated by drudge symbolic algebra system.</p>
+            <p class="small text-center">By Jinmo Zhao and Gustavo E Scuseria, Rice Univ, Houston, TX, USA</p>
+        </footer>
+    </div>
+</div> <!-- end the main fluid container -->
+</body>
+</html>
