@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 import h5py, time
 import pdb
 
-from CovBetaPT2 import *
+# from CovBetaPT2 import *
+from PyPTLib import *
 from CovMuPT2 import *
 from OpDerMP2 import *
-from MPEnergyCov import *
+# from MPEnergyCov import *
 
 from IntTran import *
 from EvolveFuncsCovar import *
@@ -94,6 +95,19 @@ def loadHDF(fname):
     
     return mo_en, mo_eri, attr_list1
 
+def createh5(fp, dsets, max_size):
+    zarr = np.zeros(max_size)
+    dsetlist = []
+    for ds in dsets:
+        dsetlist.append(
+            fp.create_dataset(ds, data=zarr)
+        )
+    return dsetlist
+
+def updateh5(dsets, vals, i_at):
+    for i in range(len(dsets)):
+        dsets[i][i_at] = vals[i]
+
 def main():
     start_time = time.time()
     
@@ -146,20 +160,24 @@ def main():
     s1_vec = np.zeros(nso**2)
     t2_vec = np.zeros( int( comb(nso,2)**2 ) )
     s2_vec = np.zeros( int( comb(nso,2)**2 ) )
+    s3_vec = np.zeros( int( comb(nso,3)**2 ) )
+    s4_vec = np.zeros( int( comb(nso,4)**2 ) )
 
     # These are the actual t1 and t2 matrices
     t1 = np.reshape(t1_vec,(nso,nso))
     t2 = T2_Decompress(t2_vec,nso)
     s1 = np.reshape(s1_vec,(nso,nso))
     s2 = T2_Decompress(s2_vec,nso)
+    s3 = T3_Decompress(s3_vec,nso)
+    s4 = T4_Decompress(s4_vec,nso)
 
     # Hartree Fock Energy at BETA = 0
     E_hf = e_nuc + EnergyHF(
         h1, x, y 
     )
 
-    e_1, e_2, o_1, o_2 = mpenergycov(
-        h1, eri, t1, t2, s1, s2, x, y
+    e_1, e_2, o_1, o_2, o_12 = mpenergycov(
+        h1, eri, t1, t2, s1, s2, s3, s4, x, y
     )
 
     # Beta Grid
@@ -169,7 +187,7 @@ def main():
 
     # Alpha Grid
     mu_0 = np.log(alpha)
-    mu_step_0 = +1e-1
+    mu_step_0 = +1e-2
     mu_f = mu_step_0
 
     n_data = 1
@@ -185,7 +203,7 @@ def main():
     #       the first and second order PT wavefunctions
     #       The order in which they are stacked is as follows:
     #               [t1,s1,t2,s2]
-    y0 = np.concatenate((t1_vec,s1_vec,t2_vec,s2_vec))
+    y0 = np.concatenate((t1_vec,s1_vec,t2_vec,s2_vec,s3_vec,s4_vec))
     ystack = np.zeros((n_data,np.size(y0)))
     ystack[0,:] = y0
 
@@ -196,6 +214,7 @@ def main():
 
     ov_mp1 = np.zeros(n_data)
     ov_mp2 = np.zeros(n_data)
+    ov_mp12 = np.zeros(n_data)
 
     mu_cc = np.zeros(n_data)
 
@@ -209,7 +228,7 @@ def main():
 
     e_hf[0] = E_hf
     e_mp1[0] = (E_hf + e_1)/(1 + o_1)
-    e_mp2[0] = (E_hf + e_1 + e_2)/(1 + o_1 + o_2)
+    e_mp2[0] = (E_hf + e_1 + e_2)/(1 + o_1 + o_12 + o_2)
     n_exp[0] = n_elec
 
     print('Thermal Hartree Fock Energy at T = Inf is :',E_hf)
@@ -230,6 +249,34 @@ def main():
     print('Number of Particles = {}'.format(num))
     
     #################################################################
+    #                   FILE OUTPUT HANDLE CREATOR                  #
+    #   Creating the h5py file headers and update the files after   #
+    #   each iteration - so that if the code blows up we know       #
+    #   where it went wrong.                                        #
+    #################################################################
+
+    fout = fn[0:-7] + 'thermal_mp_out.h5'
+    print('Writing output to {}'.format(fout))
+
+    fp1 = h5py.File(fout,'w')
+
+    dsets = ['beta','e_hf','e_mp1','e_mp2','chem_pot','t1rms','s1rms',\
+        't2rms','s2rms','num']
+
+    # Create all but the ystack data sets
+    dset_list = createh5(fp1, dsets, beta_pts)
+    dset_list.append(
+        fp1.create_dataset('tvals',data = np.zeros( (beta_pts, len(y0)) ))
+    )
+
+    vals = [
+        0, e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1],t1_rms[-1],\
+        s1_rms[-1], t2_rms[-1], s2_rms[-1], n_exp[-1], ystack[-1]
+    ]
+
+    updateh5(dset_list, vals, 0)
+
+    #################################################################
     #                   TIME AND CHEMPOT EVOLUTION                  #
     #   The actual evolution takes place in this section of code.   #
     #   First evolve in Beta Direction to a grid point and then     #
@@ -244,6 +291,8 @@ def main():
     j = 1
     len_t1 = int(nso**2)
     len_t2 = int(comb(nso,2)**2)
+    len_t3 = int(comb(nso,3)**2)
+    len_t4 = int(comb(nso,4)**2)
 
     # XXX: Checkpoint number 1
     # pdb.set_trace()
@@ -266,11 +315,11 @@ def main():
             h1*0+1, x, y
         )
 
-        n_1, n_2, o_1, o_2 = mpenergycov(
-            h1*0+1, eri*0, t1, t2, s1, s2, x, y
+        n_1, n_2, o_1, o_2, o_12 = mpenergycov(
+            h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
         )
 
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
         print('\t\t\tNumber of particles before evolution = {}'.format(num))
 
         ############################### 
@@ -286,7 +335,9 @@ def main():
         t1 = np.reshape(yf[0:len_t1],(nso,nso))
         s1 = np.reshape(yf[len_t1:2*len_t1],(nso,nso))
         t2 = T2_Decompress(yf[2*len_t1:2*len_t1+len_t2],nso)
-        s2 = T2_Decompress(yf[2*len_t1+len_t2:],nso)
+        s2 = T2_Decompress(yf[2*len_t1+len_t2:2*(len_t1+len_t2)],nso)
+        s3 = T3_Decompress(yf[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
+        s4 = T4_Decompress(yf[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
 
         # Check number after beta evolution
         x = 1/np.sqrt(1 + np.exp( -b_span[1]*h1 )*alpha )
@@ -295,10 +346,10 @@ def main():
         num_hf = EnergyHF(
             h1*0+1, x, y
         )
-        n_1, n_2, o_1, o_2 = mpenergycov(
-            h1*0+1, eri*0, t1, t2, s1, s2, x, y
+        n_1, n_2, o_1, o_2, o_12 = mpenergycov(
+            h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
         )
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
 
         print('\n\t\t\tNew Beta = {}'.format(beta_2))
         print('\t\t\tNumber of particles after evolution = {}'.format(num))
@@ -339,6 +390,7 @@ def main():
                 if count > 500:
                     print('Could not find the bracket after 1000 steps')
                     count = 0
+                    exit()
                     break
 
                 mu_span = [mu_1, mu_2]
@@ -355,15 +407,17 @@ def main():
                 s1 = np.reshape(yf2[len_t1:2*len_t1],(nso,nso))
                 t2 = T2_Decompress(yf2[2*len_t1:2*len_t1+len_t2],nso)
                 s2 = T2_Decompress(yf2[2*len_t1+len_t2:],nso)
+                s3 = T3_Decompress(yf2[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
+                s4 = T4_Decompress(yf2[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
 
                 # Evaluate the Number Expectation
                 num_hf = EnergyHF(
                     h1*0+1, x, y
                 )
-                n_1, n_2, o_1, o_2 = mpenergycov(
-                    h1*0+1, eri*0, t1, t2, s1, s2, x, y
+                n_1, n_2, o_1, o_2, o_12 = mpenergycov(
+                    h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
 
                 # Finer grid if we are closer to n_elec
                 val = np.abs(num - n_elec) - ndiff_mag
@@ -419,15 +473,17 @@ def main():
                 s1 = np.reshape(yf_mid[len_t1:2*len_t1],(nso,nso))
                 t2 = T2_Decompress(yf_mid[2*len_t1:2*len_t1+len_t2],nso)
                 s2 = T2_Decompress(yf_mid[2*len_t1+len_t2:],nso)
+                s3 = T3_Decompress(yf_mid[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
+                s4 = T4_Decompress(yf_mid[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
 
                 # Compute the number and update the bracket
                 num_hf = EnergyHF(
                     h1*0+1, x, y
                 )
-                n_1, n_2, o_1, o_2 = mpenergycov(
-                    h1*0+1, eri*0, t1, t2, s1, s2, x, y
+                n_1, n_2, o_1, o_2, o_12 = mpenergycov(
+                    h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
 
 
                 if np.sign( num - n_elec ) == ndiff_sgn1:
@@ -450,6 +506,8 @@ def main():
         s1 = np.reshape(yf[len_t1:2*len_t1],(nso,nso))
         t2 = T2_Decompress(yf[2*len_t1:2*len_t1+len_t2],nso)
         s2 = T2_Decompress(yf[2*len_t1+len_t2:],nso)
+        s3 = T3_Decompress(yf[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
+        s4 = T4_Decompress(yf[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
 
         # Setting up for next loop
         mu_0 = mu_f
@@ -464,15 +522,17 @@ def main():
             e_nuc + EnergyHF(h1, x, y)
         )
 
-        e_1, e_2, o_1, o_2 = mpenergycov(
-            h1, eri, t1, t2, s1, s2, x, y
+        e_1, e_2, o_1, o_2, o_12 = mpenergycov(
+            h1, eri, t1, t2, s1, s2, s3, s4, x, y
         )
 
         e_mp1 = np.append(e_mp1, e_hf[-1] + e_1) / (1+o_1)
-        e_mp2 = np.append(e_mp2, e_mp1[-1] + e_2) / (1+o_1+o_2)
+        e_mp2 = np.append(e_mp2, e_mp1[-1] + e_2) / (1+o_1+o_12+o_2)
 
         ov_mp1 = np.append(ov_mp1, o_1)
         ov_mp2 = np.append(ov_mp2, o_2)
+        ov_mp12 = np.append(ov_mp2, o_12)
+        print('The value of the <1|2> = {}'.format(o_12))
 
         mu_cc = np.append(mu_cc,mu_f)
 
@@ -494,6 +554,13 @@ def main():
             np.sqrt(np.mean(s2**2))
         )
 
+        vals = [
+            beta_grid[-1], e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1],t1_rms[-1],\
+            s1_rms[-1], t2_rms[-1], s2_rms[-1], n_exp[-1], ystack[-1]
+        ]
+
+        updateh5(dset_list, vals, j)
+
         print('At beta = {}'.format(b_span[-1]))
         print('mu = {}'.format(mu_f))
         print('N_elec = {}'.format(n_exp[j]))
@@ -504,55 +571,50 @@ def main():
     ode_time = time.time()
 
 
-    # Writing the data to a file (energy data only for now)
-    fout = fn[0:-7] + 'thermal_ccsd_out.h5'
-    print('Writing output to {}'.format(fout))
+    # TODO: If the code works, then remove this commented section
+    # dset1 = fp1.create_dataset('beta',data=beta_grid)
+    # for tup in attrs:
+    #     dset1.attrs[tup[0]] = tup[1]
+    # 
+    # dset2 = fp1.create_dataset('e_hf',data=e_hf)
+    # for tup in attrs:
+    #     dset2.attrs[tup[0]] = tup[1]
 
-    fp1 = h5py.File(fout,'w')
+    # dset2a = fp1.create_dataset('e_mp1',data=e_mp1)
+    # for tup in attrs:
+    #     dset2a.attrs[tup[0]] = tup[1]
 
-    dset1 = fp1.create_dataset('beta',data=beta_grid)
-    for tup in attrs:
-        dset1.attrs[tup[0]] = tup[1]
-    
-    dset2 = fp1.create_dataset('e_hf',data=e_hf)
-    for tup in attrs:
-        dset2.attrs[tup[0]] = tup[1]
+    # dset2b = fp1.create_dataset('e_mp2',data=e_mp2)
+    # for tup in attrs:
+    #     dset2b.attrs[tup[0]] = tup[1]
+    #     
+    # dset3 = fp1.create_dataset('chem_pot',data=mu_cc)
+    # for tup in attrs:
+    #     dset3.attrs[tup[0]] = tup[1]
 
-    dset2a = fp1.create_dataset('e_mp1',data=e_mp1)
-    for tup in attrs:
-        dset2a.attrs[tup[0]] = tup[1]
+    # dset4 = fp1.create_dataset('t1rms',data=t1_rms)
+    # for tup in attrs:
+    #     dset4.attrs[tup[0]] = tup[1]
 
-    dset2b = fp1.create_dataset('e_mp2',data=e_mp2)
-    for tup in attrs:
-        dset2b.attrs[tup[0]] = tup[1]
-        
-    dset3 = fp1.create_dataset('chem_pot',data=mu_cc)
-    for tup in attrs:
-        dset3.attrs[tup[0]] = tup[1]
+    # dset5 = fp1.create_dataset('s1rms',data=s1_rms)
+    # for tup in attrs:
+    #     dset5.attrs[tup[0]] = tup[1]
 
-    dset4 = fp1.create_dataset('t1rms',data=t1_rms)
-    for tup in attrs:
-        dset4.attrs[tup[0]] = tup[1]
+    # dset6 = fp1.create_dataset('t2rms',data=t2_rms)
+    # for tup in attrs:
+    #     dset6.attrs[tup[0]] = tup[1]
 
-    dset5 = fp1.create_dataset('s1rms',data=s1_rms)
-    for tup in attrs:
-        dset5.attrs[tup[0]] = tup[1]
+    # dset6a = fp1.create_dataset('s2rms',data=s2_rms)
+    # for tup in attrs:
+    #     dset6a.attrs[tup[0]] = tup[1]
 
-    dset6 = fp1.create_dataset('t2rms',data=t2_rms)
-    for tup in attrs:
-        dset6.attrs[tup[0]] = tup[1]
+    # dset7 = fp1.create_dataset('num',data=n_exp)
+    # for tup in attrs:
+    #     dset7.attrs[tup[0]] = tup[1]
 
-    dset6a = fp1.create_dataset('s2rms',data=s2_rms)
-    for tup in attrs:
-        dset6a.attrs[tup[0]] = tup[1]
-
-    dset7 = fp1.create_dataset('num',data=n_exp)
-    for tup in attrs:
-        dset7.attrs[tup[0]] = tup[1]
-
-    dset8 = fp1.create_dataset('tvals',data=ystack)
-    for tup in attrs:
-        dset8.attrs[tup[0]] = tup[1]
+    # dset8 = fp1.create_dataset('tvals',data=ystack)
+    # for tup in attrs:
+    #     dset8.attrs[tup[0]] = tup[1]
 
     fp1.close()
 

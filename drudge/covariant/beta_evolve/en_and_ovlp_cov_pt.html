@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thermal Perturbation Theory</title>
+
+    <!-- MathJAX intialization -->
+    <script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			"HTML-CSS": { linebreaks: { automatic: true } },
+			SVG: { linebreaks: { automatic: true } }
+		});
+	</script>
+	<script type="text/javascript"
+		src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
+
+    <!-- Boostrap initialization -->
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1>Thermal Perturbation Theory</h1>
+    </div>
+
+    <div class="row">
+        <!-- The main content -->
+        <div class="col-sm-9 col-lg-10">
+            <div class="page-header" id="sect-1">
+                <h2>Full Hamiltonian</h2>
+            </div>
+            <p>\[ \sum_{a \in L} e^{(0)}_{a}    d^{\dagger}_{a} d^{}_{a}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} u_{a,b,c,d}    d^{\dagger}_{a} d^{\dagger}_{b} d^{}_{d} d^{}_{c} \]</p>
+            <div class="page-header" id="sect-2">
+                <h2>Thermal Ham</h2>
+            </div>
+            <p>\[ \sum_{a \in L} e^{(0)}_{a}  x_{a}  y_{a}    c^{}_{a, \downarrow} c^{}_{a, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  y_{a}  y_{b}  u_{b,c,a,c}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} y_{a}  y_{b}  y_{c}  y_{d}  u_{c,d,a,b}    c^{\dagger}_{a, \downarrow} c^{\dagger}_{b, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \downarrow} - \sum_{a \in L} y_{a}^{2}  e^{(0)}_{a}    c^{\dagger}_{a, \downarrow} c^{}_{a, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  x_{b}  u_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} x_{a}  x_{b}  x_{c}  x_{d}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{}_{d, \uparrow} c^{}_{c, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} x_{a}  x_{c}  y_{b}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \uparrow}  + \sum_{a \in L} y_{a}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{a}  x_{b}  x_{c}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{}_{d, \downarrow} c^{}_{c, \uparrow} c^{}_{b, \uparrow}  + \sum_{a \in L} x_{a}^{2}  e^{(0)}_{a}    c^{\dagger}_{a, \uparrow} c^{}_{a, \uparrow}  + \sum_{a \in L} e^{(0)}_{a}  x_{a}  y_{a}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{a, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} x_{a}  x_{b}  x_{d}  y_{c}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{b}  y_{a}  y_{c}  y_{d}  u_{c,d,a,b}    c^{\dagger}_{a, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \downarrow} c^{}_{b, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  u_{c,d,a,b}    c^{}_{d, \downarrow} c^{}_{c, \downarrow} c^{}_{b, \uparrow} c^{}_{a, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} x_{a}  y_{b}  y_{c}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \frac{1}{2} y_{a}^{2}  y_{b}^{2}  u_{a,b,a,b}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  u_{b,c,a,c}    c^{}_{b, \downarrow} c^{}_{a, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  u_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-3">
+                <h2>Tvec</h2>
+            </div>
+            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-4">
+                <h2>Svec</h2>
+            </div>
+            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{1}{36} s^{(3)}_{a,b,c,d,i,j}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \uparrow} c^{\dagger}_{d, \downarrow} c^{\dagger}_{i, \downarrow} c^{\dagger}_{j, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \sum_{k \in L} \sum_{l \in L} \frac{1}{576} s^{(4)}_{a,b,c,d,i,j,k,l}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \uparrow} c^{\dagger}_{d, \uparrow} c^{\dagger}_{i, \downarrow} c^{\dagger}_{j, \downarrow} c^{\dagger}_{k, \downarrow} c^{\dagger}_{l, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} s^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} s^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-5">
+                <h2>The Spin Rep for Tilde and non Tilde</h2>
+            </div>
+            <p>\[  c^{}_{a, \uparrow}  +  c^{}_{b, \downarrow} \]</p>
+            <div class="page-header" id="sect-6">
+                <h2>Ovlp due to MP1</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{a,b,c,d}^{2}   + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}^{2}  \]</p>
+            <div class="page-header" id="sect-7">
+                <h2>Ovlp due to MP2</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \sum_{k \in L} \sum_{l \in L} \frac{1}{576} s^{(4)}_{a,b,c,d,i,j,k,l}^{2}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} s^{(2)}_{a,b,c,d}^{2}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{36} s^{(3)}_{a,b,c,d,i,j}^{2}   + \sum_{a \in L} \sum_{b \in L} s^{(1)}_{a,b}^{2}  \]</p>
+            <div class="page-header" id="sect-8">
+                <h2>MP1 Energy</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \frac{1}{2} y_{a}^{2}  y_{b}^{2}  u_{a,b,a,b}   + \sum_{a \in L} 2 e^{(0)}_{a}  x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
+            <div class="page-header" id="sect-9">
+                <h2>MP2 Energy</h2>
+            </div>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{a,b,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{c,d,a,b}   + \sum_{a \in L} 2 e^{(0)}_{a}  x_{a}  y_{a}  s^{(1)}_{a,a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{a,c,b,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{b,c,a,c}  \]</p>
+            <div class="page-header" id="sect-10">
+                <h2>Intermediate Eqn 0</h2>
+            </div>
+            <p>\[ e_{1} = \sum_{a \in L} \sum_{b \in L} \frac{1}{2} y_{a}^{2}  y_{b}^{2}  u_{a,b,a,b}   + \sum_{a \in L} 2 e^{(0)}_{a}  x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
+            <div class="page-header" id="sect-11">
+                <h2>Intermediate Eqn 1</h2>
+            </div>
+            <p>\[ e_{2} = \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{a,b,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{c,d,a,b}   + \sum_{a \in L} 2 e^{(0)}_{a}  x_{a}  y_{a}  s^{(1)}_{a,a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{a,c,b,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{b,c,a,c}  \]</p>
+            <div class="page-header" id="sect-12">
+                <h2>Intermediate Eqn 2</h2>
+            </div>
+            <p>\[ ov_{1} = \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{a,b,c,d}^{2}   + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}^{2}  \]</p>
+            <div class="page-header" id="sect-13">
+                <h2>Intermediate Eqn 3</h2>
+            </div>
+            <p>\[ ov_{2} = \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \sum_{k \in L} \sum_{l \in L} \frac{1}{576} s^{(4)}_{a,b,c,d,i,j,k,l}^{2}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} s^{(2)}_{a,b,c,d}^{2}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{36} s^{(3)}_{a,b,c,d,i,j}^{2}   + \sum_{a \in L} \sum_{b \in L} s^{(1)}_{a,b}^{2}  \]</p>
+        </div>
+
+        <!-- The navigation -->
+        <div class="col-sm-3 col-lg-2">
+            <ul class="nav nav-pills nav-stacked">
+                <li class="active"><a href="#sect-1">Full Hamiltonian</a></li>
+                <li ><a href="#sect-2">Thermal Ham</a></li>
+                <li ><a href="#sect-3">Tvec</a></li>
+                <li ><a href="#sect-4">Svec</a></li>
+                <li ><a href="#sect-5">The Spin Rep for Tilde and non Tilde</a></li>
+                <li ><a href="#sect-6">Ovlp due to MP1</a></li>
+                <li ><a href="#sect-7">Ovlp due to MP2</a></li>
+                <li ><a href="#sect-8">MP1 Energy</a></li>
+                <li ><a href="#sect-9">MP2 Energy</a></li>
+                <li ><a href="#sect-10">Intermediate Eqn 0</a></li>
+                <li ><a href="#sect-11">Intermediate Eqn 1</a></li>
+                <li ><a href="#sect-12">Intermediate Eqn 2</a></li>
+                <li ><a href="#sect-13">Intermediate Eqn 3</a></li>
+            </ul>
+        </div>
+    </div> <!-- end the main row -->
+
+    <!-- The footer -->
+    <div class="row">
+        <footer class="footer">
+            <p class="small text-center">Automatically generated by drudge symbolic algebra system.</p>
+            <p class="small text-center">By Jinmo Zhao and Gustavo E Scuseria, Rice Univ, Houston, TX, USA</p>
+        </footer>
+    </div>
+</div> <!-- end the main fluid container -->
+</body>
+</html>

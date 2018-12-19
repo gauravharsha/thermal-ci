@@ -1,6 +1,6 @@
 """
     Date: Dec 4, 2018
-    Modified: Dec 13, 2018
+    Modified: Dec 19, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal PT
     This is covariant version - i.e. the reference keeps evolving
     Location: h2_thermal/v3/
@@ -72,6 +72,7 @@ t2 = IndexedBase('t2')
 s1 = IndexedBase('s1')
 s2 = IndexedBase('s2')
 s3 = IndexedBase('s3')
+s4 = IndexedBase('s4')
 
 dr2.set_symm(t2,
     Perm([1,0,2,3],NEG),
@@ -90,6 +91,15 @@ dr2.set_symm(s3,
     Perm([0,1,2,4,3,5],NEG),
     Perm([0,1,2,3,5,4],NEG),
     Perm([0,1,2,5,4,3],IDENT),
+)
+
+dr2.set_symm(s4,
+    Perm([1,0,2,3,4,5,6,7],NEG),
+    Perm([0,2,1,3,4,5,6,7],NEG),
+    Perm([0,1,3,2,4,5,6,7],NEG),
+    Perm([0,1,2,3,5,4,6,7],NEG),
+    Perm([0,1,2,3,4,6,5,7],NEG),
+    Perm([0,1,2,3,4,5,7,6],NEG),
 )
 
 T1 = dr2.einst(
@@ -114,8 +124,13 @@ S3 = dr2.einst(
         * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 36
 )
 
+S4 = dr2.einst(
+    s4[a, b, c, d, i, j, k, l] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] \
+        * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 576
+)
+
 Tvec = dr2.simplify(T1 + T2)
-Svec = dr2.simplify(S1 + S2 + S3)
+Svec = dr2.simplify(S1 + S2 + S3 + S4)
 
 t1_2_s1_def = dr.define( t1[a,b] , s1[a,b] )
 t2_2_s2_def = dr.define( t2[a,b,c,d] , s2[a,b,c,d] )
@@ -262,7 +277,7 @@ proj_s1 = proj_t1
 proj_s2 = proj_t2
 
 proj_s3 = (
-    c_[a,DOWN] * c_[b,DOWN] * c_[c,DOWN] * c_dag[r,UP] * c_dag[q,UP] * c_dag[p,UP]
+    c_[a,DOWN] * c_[b,DOWN] * c_[c,DOWN] * c_[r,UP] * c_[q,UP] * c_[p,UP]
 )
 
 # Projected with proj_t1
@@ -369,6 +384,7 @@ dS_dMu_3body_eqn_in_dr = Tensor(
     dr,
     dS_dMu_3body_eqn.terms
 )
+"""
 # Now the actual optimization process
 tbeta1 = IndexedBase('tb1')
 tbeta2 = IndexedBase('tb2')
@@ -414,6 +430,7 @@ code = fort_print.doprint(eval_seq, separate_decls=False)
 with open('OpDerMP2.f90','w') as fp:
     print(code, file=fp)
 
+"""
 
 """-------------------------------------------------------------------------"""
 """                        Testing the Stuff Generated                      """

@@ -182,8 +182,13 @@ S3 = dr2.einst(
         * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 36
 )
 
+S4 = dr2.einst(
+    s4[a, b, c, d, i, j, k, l] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] \
+        * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 576
+)
+
 Tvec = dr2.simplify(T1 + T2)
-Svec = dr2.simplify(S1 + S2 + S3)
+Svec = dr2.simplify(S1 + S2 + S3 + S4)
 
 #########################################################################
 ##      Perturbation Theory equation looks like                        ##
@@ -228,7 +233,12 @@ proj_s2 = (
 )
 
 proj_s3 = (
-    c_[a,DOWN] * c_[b,DOWN] * c_[c,DOWN] * c_dag[r,UP] * c_dag[q,UP] * c_dag[p,UP]
+    c_[a,DOWN] * c_[b,DOWN] * c_[c,DOWN] * c_[r,UP] * c_[q,UP] * c_[p,UP]
+)
+
+proj_s4 = (
+    c_[a,DOWN] * c_[b,DOWN] * c_[c,DOWN] * c_[d,DOWN] *\
+        c_[s,UP] * c_[r,UP] * c_[q,UP] * c_[p,UP]
 )
 
 rt1_th = dr2.memoize(lambda: dr2.simplify(proj_t1 * (mp1_rhs_op)),'RTpa.pickle')
@@ -237,6 +247,7 @@ rt2_th = dr2.memoize(lambda: dr2.simplify(proj_t2 * (mp1_rhs_op)),'RTpqab.pickle
 rs1_th = dr2.memoize(lambda: dr2.simplify(proj_s1 * (mp2_rhs_op)),'RSpa.pickle')
 rs2_th = dr2.memoize(lambda: dr2.simplify(proj_s2 * (mp2_rhs_op)),'RSpqab.pickle')
 rs3_th = dr2.memoize(lambda: dr2.simplify(proj_s3 * (mp2_rhs_op)),'RSpqrabc.pickle')
+rs4_th = dr2.memoize(lambda: dr2.simplify(proj_s4 * (mp2_rhs_op)),'RSpqrsabcd.pickle')
 
 # Derive the working equations by projection
 rt_1body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rt1_th )))
@@ -245,6 +256,7 @@ rt_2body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rt2_th )))
 rs_1body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs1_th )))
 rs_2body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs2_th )))
 rs_3body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs3_th )))
+rs_4body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs4_th )))
 
 print('Equations obtained')
 
@@ -255,13 +267,15 @@ t2dag_t = dr2.simplify( proj_t2 * ( Tvec ) )
 s1dag_s = dr2.simplify( proj_s1 * ( Svec ) )
 s2dag_s = dr2.simplify( proj_s2 * ( Svec ) )
 s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
+s4dag_s = dr2.simplify( proj_s4 * ( Svec ) )
 
 t1_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t1dag_t ) )
 t2_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t2dag_t ) )
 
 s1_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s1dag_s ) )
 s2_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s2dag_s ) )
-s3_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s1dag_s ) )
+s3_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s3dag_s ) )
+s4_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s4dag_s ) )
 
 # T2 equation time
 t2eqn_time = time.time()
@@ -297,6 +311,10 @@ rs3_eqn_in_dr = Tensor(
     dr,
     rs_3body.terms
 )
+rs4_eqn_in_dr = Tensor(
+    dr,
+    rs_4body.terms
+)
 
 # Now the actual optimization process
 rt1 = IndexedBase('rt1')
@@ -304,12 +322,16 @@ rt2 = IndexedBase('rt2')
 
 rs1 = IndexedBase('rs1')
 rs2 = IndexedBase('rs2')
+rs3 = IndexedBase('rs3')
+rs4 = IndexedBase('rs4')
 
 work_eqn = [
     dr.define(rt1[p,a], rt1_eqn_in_dr),
     dr.define(rt2[p,q,a,b], rt2_eqn_in_dr),
     dr.define(rs1[p,a], rs1_eqn_in_dr),
     dr.define(rs2[p,q,a,b], rs2_eqn_in_dr),
+    dr.define(rs3[p,q,r,a,b,c], rs3_eqn_in_dr),
+    dr.define(rs4[p,q,r,s,a,b,c,d], rs4_eqn_in_dr)
 ]
 
 # Original Un-optimized cost
@@ -331,9 +353,12 @@ print(opt_cost)
 # Code Generation
 # fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
 # code = fort_print.doprint(eval_seq, separate_decls=False)
-# 
-# with open('CovariantPT2.f90','w') as fp:
-#     print(code, file=fp)
+# NOTE: Since there are 8-index objects involved here, we will use einsum printer
+ein_print = EinsumPrinter()
+code = ein_print.doprint(eval_seq, separate_decls=False)
+
+with open('new.py','w') as fp:
+    print(code, file=fp)
 
 
 
@@ -351,6 +376,7 @@ with dr.report('cov_pt.html','Thermal Perturbation Theory') as rep:
     rep.add('MP2 1 body eqn',rs_1body)
     rep.add('MP2 2 body eqn',rs_2body)
     rep.add('MP2 3 body eqn',rs_3body)
+    rep.add('MP2 4 body eqn',rs_4body)
     rep.add('Tdag1 * T',t1_dag_t_exp)
     rep.add('Tdag2 * T',t2_dag_t_exp)
     rep.add('Sdag1 * S',s1_dag_s_exp)

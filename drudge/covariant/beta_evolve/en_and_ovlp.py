@@ -16,6 +16,8 @@ from sympy import *
 #Symbol, symbols, IndexedBase, sqrt, init_printing, KroneckerDelta
 from gristmill import *
 import time
+from cprint import *
+import pdb
 
 delK = KroneckerDelta
 
@@ -131,6 +133,7 @@ t2 = IndexedBase('t2')
 s1 = IndexedBase('s1')
 s2 = IndexedBase('s2')
 s3 = IndexedBase('s3')
+s4 = IndexedBase('s4')
 
 dr2.set_symm(t2,
     Perm([1,0,2,3],NEG),
@@ -149,6 +152,15 @@ dr2.set_symm(s3,
     Perm([0,1,2,4,3,5],NEG),
     Perm([0,1,2,3,5,4],NEG),
     Perm([0,1,2,5,4,3],IDENT),
+)
+
+dr2.set_symm(s4,
+    Perm([1,0,2,3,4,5,6,7],NEG),
+    Perm([0,2,1,3,4,5,6,7],NEG),
+    Perm([0,1,3,2,4,5,6,7],NEG),
+    Perm([0,1,2,3,5,4,6,7],NEG),
+    Perm([0,1,2,3,4,6,5,7],NEG),
+    Perm([0,1,2,3,4,5,7,6],NEG),
 )
 
 T1 = dr2.einst(
@@ -174,12 +186,17 @@ S3 = dr2.einst(
         * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 36
 )
 
+S4 = dr2.einst(
+    s4[a, b, c, d, i, j, k, l] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] \
+        * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 576
+)
+
 T1dag = dr2.einst(
     t1[a,b] * (c_[b,DOWN] * c_[a,UP] )
 )
 
 T2dag = dr2.einst(
-    t2[a,b,c,d] * ( c_[c,DOWN] * c_[d,DOWN] * c_[b,UP] * c_[a,UP] )
+    t2[a,b,c,d] * ( c_[c,DOWN] * c_[d,DOWN] * c_[b,UP] * c_[a,UP] ) / 4
 )
 
 S1dag = dr2.einst(
@@ -196,11 +213,16 @@ S3dag = dr2.einst(
         * c_[c,UP] * c_[b,UP] * c_[a,UP]) / 36
 )
 
+S4dag = dr2.einst(
+    s4[a, b, c, d, i, j, k, l] * (c_[i,DOWN] * c_[j,DOWN] * c_[k,DOWN] * c_[l,DOWN] \
+        * c_[d,UP] * c_[c,UP] * c_[b,UP] * c_[a,UP]) / 576
+)
+
 Tvec = dr2.simplify(T1 + T2)
 Tdagvec = dr2.simplify(T1dag + T2dag)
 
-Svec = dr2.simplify(S1 + S2 + S3)
-Sdagvec = dr2.simplify(S1dag + S2dag + S3dag)
+Svec = dr2.simplify(S1 + S2 + S3 + S4)
+Sdagvec = dr2.simplify(S1dag + S2dag + S3dag + S4dag)
 
 
 """-------------------------------------------------------------------------"""
@@ -283,20 +305,27 @@ init_printing()
 print(orig_cost)
 
 # Optimizing
-eval_seq = optimize(
-    work_eqn,
-    interm_fmt = 'tau{}'
-)
+# eval_seq = optimize(
+#     work_eqn,
+#     interm_fmt = 'tau{}'
+# )
+eval_seq = work_eqn
 
 print(len(eval_seq))
 opt_cost = get_flop_cost(eval_seq, leading=True)
 print(opt_cost)
 
 # Code Generation
-fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
-code = fort_print.doprint(eval_seq, separate_decls=False)
+# fort_print = C99CodePrinter(default_type='Real (Kind=8)', explicit_bounds=True)
+# code = fort_print.doprint(eval_seq, separate_decls=False)
+# c_print = C99CodePrinter()
+# pdb.set_trace()
+# ein_print = EinsumPrinter()
 
-with open('MPEnergy.f90','w') as fp:
+c_print = CPrinter()
+code = c_print.doprint(eval_seq, separate_decls=False)
+
+with open('new_try.c','w') as fp:
     print(code, file=fp)
 
 
