@@ -28,6 +28,8 @@ t1_rms = f1['t1rms'][:blen]
 t2_rms = f1['t2rms'][:blen]
 s1_rms = f1['s1rms'][:blen]
 s2_rms = f1['s2rms'][:blen]
+s3_rms = f1['s3rms'][:blen]
+s4_rms = f1['s4rms'][:blen]
 
 
 f1.close()
@@ -40,7 +42,7 @@ f1.close()
 fout = fname[0:-7]+'_'
 
 plt.figure()
-pdb.set_trace()
+# pdb.set_trace()
 plt.plot(beta,e_hf,label='HF')
 plt.plot(beta,e_mp1,label='MP1')
 plt.plot(beta,e_mp2,label='MP2')
@@ -70,6 +72,16 @@ plt.xlabel(r'$\beta$')
 plt.ylabel('RMS t2 and s2')
 plt.xlim(beta[0],beta[-1])
 plt.savefig(fout+'t2_amp.pdf')
+plt.close()
+
+plt.figure()
+plt.plot(beta,s3_rms,label='RMS s3')
+plt.plot(beta,s4_rms,label='RMS s4')
+plt.legend()
+plt.xlabel(r'$\beta$')
+plt.ylabel('RMS s3 and s4')
+plt.xlim(beta[0],beta[-1])
+plt.savefig(fout+'s34_amp.pdf')
 plt.close()
 
 plt.figure()

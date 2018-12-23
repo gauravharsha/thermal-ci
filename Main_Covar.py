@@ -5,11 +5,9 @@ import matplotlib.pyplot as plt
 import h5py, time
 import pdb
 
-# from CovBetaPT2 import *
 from PyPTLib import *
 from CovMuPT2 import *
-from OpDerMP2 import *
-# from MPEnergyCov import *
+from OpDerLib import *
 
 from IntTran import *
 from EvolveFuncsCovar import *
@@ -156,6 +154,13 @@ def main():
     
     # Initializing the amplitude vectors - only the unique matrix
     # elements in the t1 and t2 matrices
+    len_t1 = int(nso**2)
+    len_t2 = int(comb(nso,2)**2)
+    len_t3 = int(comb(nso,3)**2)
+    len_t4 = int(comb(nso,4)**2)
+
+    t0 = 0.0
+    s0 = 0.0
     t1_vec = np.zeros(nso**2)
     s1_vec = np.zeros(nso**2)
     t2_vec = np.zeros( int( comb(nso,2)**2 ) )
@@ -176,8 +181,8 @@ def main():
         h1, x, y 
     )
 
-    e_1, e_2, o_1, o_2, o_12 = mpenergycov(
-        h1, eri, t1, t2, s1, s2, s3, s4, x, y
+    e_1, e_2, o_1, o_2, o_3, o_4 = mpenergycov(
+        h1, eri, t0, t1, t2, s0, s1, s2, s3, s4, x, y
     )
 
     # Beta Grid
@@ -187,7 +192,7 @@ def main():
 
     # Alpha Grid
     mu_0 = np.log(alpha)
-    mu_step_0 = +1e-2
+    mu_step_0 = +1e-3
     mu_f = mu_step_0
 
     n_data = 1
@@ -199,11 +204,11 @@ def main():
     #################################################################
 
     # initial condition for Tamps at beta = 0 = mu
-    # NOTE: there are two singles and doubles parameters here, one each for
-    #       the first and second order PT wavefunctions
+    # NOTE: there are two sets of scalars, singles and doubles parameters here,
+    #       one each for the first and second order PT wavefunctions
     #       The order in which they are stacked is as follows:
     #               [t1,s1,t2,s2]
-    y0 = np.concatenate((t1_vec,s1_vec,t2_vec,s2_vec,s3_vec,s4_vec))
+    y0 = np.concatenate(([t0],[s0],t1_vec,s1_vec,t2_vec,s2_vec,s3_vec,s4_vec))
     ystack = np.zeros((n_data,np.size(y0)))
     ystack[0,:] = y0
 
@@ -212,23 +217,27 @@ def main():
     e_mp1 = np.zeros(n_data)
     e_mp2 = np.zeros(n_data)
 
-    ov_mp1 = np.zeros(n_data)
     ov_mp2 = np.zeros(n_data)
-    ov_mp12 = np.zeros(n_data)
+    ov_mp3 = np.zeros(n_data)
+    ov_mp4 = np.zeros(n_data)
 
     mu_cc = np.zeros(n_data)
 
     n_exp = np.zeros(n_data)
 
+    t0_rms = np.zeros(n_data)
     t1_rms = np.zeros(n_data)
     t2_rms = np.zeros(n_data)
 
+    s0_rms = np.zeros(n_data)
     s1_rms = np.zeros(n_data)
     s2_rms = np.zeros(n_data)
+    s3_rms = np.zeros(n_data)
+    s4_rms = np.zeros(n_data)
 
     e_hf[0] = E_hf
-    e_mp1[0] = (E_hf + e_1)/(1 + o_1)
-    e_mp2[0] = (E_hf + e_1 + e_2)/(1 + o_1 + o_12 + o_2)
+    e_mp1[0] = (E_hf + e_1)/(1 + o_1 + o_2)
+    e_mp2[0] = (E_hf + e_1 + e_2)/(1 + o_1 + o_2 + o_3 + o_4)
     n_exp[0] = n_elec
 
     print('Thermal Hartree Fock Energy at T = Inf is :',E_hf)
@@ -260,8 +269,8 @@ def main():
 
     fp1 = h5py.File(fout,'w')
 
-    dsets = ['beta','e_hf','e_mp1','e_mp2','chem_pot','t1rms','s1rms',\
-        't2rms','s2rms','num']
+    dsets = ['beta','e_hf','e_mp1','e_mp2','chem_pot','t0rms','t1rms','s0rms','s1rms',\
+        't2rms','s2rms','s3rms','s4rms','num']
 
     # Create all but the ystack data sets
     dset_list = createh5(fp1, dsets, beta_pts)
@@ -269,9 +278,12 @@ def main():
         fp1.create_dataset('tvals',data = np.zeros( (beta_pts, len(y0)) ))
     )
 
+    # XXX: Another de-bugger
+    # pdb.set_trace()
+
     vals = [
-        0, e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1],t1_rms[-1],\
-        s1_rms[-1], t2_rms[-1], s2_rms[-1], n_exp[-1], ystack[-1]
+        0, e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1], t0_rms[-1], t1_rms[-1],\
+        s0_rms[-1], s1_rms[-1], t2_rms[-1], s2_rms[-1], s3_rms[-1], s4_rms[-1], n_exp[-1], ystack[-1]
     ]
 
     updateh5(dset_list, vals, 0)
@@ -289,11 +301,6 @@ def main():
     # mu_solver = ode(mu_evolve).set_integrator('dopri5',rtol=deqtol)
 
     j = 1
-    len_t1 = int(nso**2)
-    len_t2 = int(comb(nso,2)**2)
-    len_t3 = int(comb(nso,3)**2)
-    len_t4 = int(comb(nso,4)**2)
-
     # XXX: Checkpoint number 1
     # pdb.set_trace()
 
@@ -315,29 +322,31 @@ def main():
             h1*0+1, x, y
         )
 
-        n_1, n_2, o_1, o_2, o_12 = mpenergycov(
-            h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
+        n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
+            h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
         )
 
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
+        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
         print('\t\t\tNumber of particles before evolution = {}'.format(num))
 
         ############################### 
         # 2: Beta evolution 
         ############################### 
 
-        beta_solver.set_initial_value(y0, b_span[0]).set_f_params(mu_cc[-1],alpha,h1, eri)
+        beta_solver.set_initial_value(y0, b_span[0]).set_f_params(alpha, h1, eri)
 
         # Integrate the BETA_SOLVE
         yf = beta_solver.integrate(b_span[1])
 
         # Extract the values
-        t1 = np.reshape(yf[0:len_t1],(nso,nso))
-        s1 = np.reshape(yf[len_t1:2*len_t1],(nso,nso))
-        t2 = T2_Decompress(yf[2*len_t1:2*len_t1+len_t2],nso)
-        s2 = T2_Decompress(yf[2*len_t1+len_t2:2*(len_t1+len_t2)],nso)
-        s3 = T3_Decompress(yf[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
-        s4 = T4_Decompress(yf[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
+        t0 = yf[0]
+        s0 = yf[1]
+        t1 = np.reshape(yf[2:2+len_t1],(nso,nso))
+        s1 = np.reshape(yf[2+len_t1:2+2*len_t1],(nso,nso))
+        t2 = T2_Decompress(yf[2+2*len_t1:2+2*len_t1+len_t2],nso)
+        s2 = T2_Decompress(yf[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
+        s3 = T3_Decompress(yf[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
+        s4 = T4_Decompress(yf[2+2*(len_t1+len_t2)+len_t3:],nso)
 
         # Check number after beta evolution
         x = 1/np.sqrt(1 + np.exp( -b_span[1]*h1 )*alpha )
@@ -346,10 +355,10 @@ def main():
         num_hf = EnergyHF(
             h1*0+1, x, y
         )
-        n_1, n_2, o_1, o_2, o_12 = mpenergycov(
-            h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
+        n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
+            h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
         )
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
+        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
 
         print('\n\t\t\tNew Beta = {}'.format(beta_2))
         print('\t\t\tNumber of particles after evolution = {}'.format(num))
@@ -403,21 +412,23 @@ def main():
                 yf2 = mu_solver.integrate(mu_span[1])
 
                 # Extract the amplitudes
-                t1 = np.reshape(yf2[0:len_t1],(nso,nso))
-                s1 = np.reshape(yf2[len_t1:2*len_t1],(nso,nso))
-                t2 = T2_Decompress(yf2[2*len_t1:2*len_t1+len_t2],nso)
-                s2 = T2_Decompress(yf2[2*len_t1+len_t2:],nso)
-                s3 = T3_Decompress(yf2[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
-                s4 = T4_Decompress(yf2[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
+                t0 = yf2[0]
+                s0 = yf2[1]
+                t1 = np.reshape(yf2[2:2+len_t1],(nso,nso))
+                s1 = np.reshape(yf2[2+len_t1:2+2*len_t1],(nso,nso))
+                t2 = T2_Decompress(yf2[2+2*len_t1:2+2*len_t1+len_t2],nso)
+                s2 = T2_Decompress(yf2[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
+                s3 = T3_Decompress(yf2[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
+                s4 = T4_Decompress(yf2[2+2*(len_t1+len_t2)+len_t3:],nso)
 
                 # Evaluate the Number Expectation
                 num_hf = EnergyHF(
                     h1*0+1, x, y
                 )
-                n_1, n_2, o_1, o_2, o_12 = mpenergycov(
-                    h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
+                n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
+                    h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
+                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
 
                 # Finer grid if we are closer to n_elec
                 val = np.abs(num - n_elec) - ndiff_mag
@@ -427,7 +438,7 @@ def main():
                     else:
                         mu_step *= -1
                     
-                    if sp_count >= 25:
+                    if sp_count >= 10:
                         mu_step *= -1
                         sp_count = 0
 
@@ -469,21 +480,23 @@ def main():
                 yf_mid = mu_solver.integrate(mu_mid)
 
                 # Extract the amplitudes
-                t1 = np.reshape(yf_mid[0:len_t1],(nso,nso))
-                s1 = np.reshape(yf_mid[len_t1:2*len_t1],(nso,nso))
-                t2 = T2_Decompress(yf_mid[2*len_t1:2*len_t1+len_t2],nso)
-                s2 = T2_Decompress(yf_mid[2*len_t1+len_t2:],nso)
-                s3 = T3_Decompress(yf_mid[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
-                s4 = T4_Decompress(yf_mid[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
+                t0 = yf_mid[0]
+                s0 = yf_mid[1]
+                t1 = np.reshape(yf_mid[2:2+len_t1],(nso,nso))
+                s1 = np.reshape(yf_mid[2+len_t1:2+2*len_t1],(nso,nso))
+                t2 = T2_Decompress(yf_mid[2+2*len_t1:2+2*len_t1+len_t2],nso)
+                s2 = T2_Decompress(yf_mid[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
+                s3 = T3_Decompress(yf_mid[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
+                s4 = T4_Decompress(yf_mid[2+2*(len_t1+len_t2)+len_t3:],nso)
 
                 # Compute the number and update the bracket
                 num_hf = EnergyHF(
                     h1*0+1, x, y
                 )
-                n_1, n_2, o_1, o_2, o_12 = mpenergycov(
-                    h1*0+1, eri*0, t1, t2, s1, s2, s3, s4, x, y
+                n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
+                    h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_12)
+                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
 
 
                 if np.sign( num - n_elec ) == ndiff_sgn1:
@@ -502,12 +515,14 @@ def main():
             yf = mu_solver.integrate(mu_f)
 
 
-        t1 = np.reshape(yf[0:len_t1],(nso,nso))
-        s1 = np.reshape(yf[len_t1:2*len_t1],(nso,nso))
-        t2 = T2_Decompress(yf[2*len_t1:2*len_t1+len_t2],nso)
-        s2 = T2_Decompress(yf[2*len_t1+len_t2:],nso)
-        s3 = T3_Decompress(yf[2*(len_t1+len_t2):2*(len_t1+len_t2)+len_t3],nso)
-        s4 = T4_Decompress(yf[2*(len_t1+len_t2)+len_t3:2*(len_t1+len_t2)+len_t3+len_t4],nso)
+        t0 = yf[0]
+        s0 = yf[1]
+        t1 = np.reshape(yf[2:2+len_t1],(nso,nso))
+        s1 = np.reshape(yf[2+len_t1:2+2*len_t1],(nso,nso))
+        t2 = T2_Decompress(yf[2+2*len_t1:2+2*len_t1+len_t2],nso)
+        s2 = T2_Decompress(yf[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
+        s3 = T3_Decompress(yf[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
+        s4 = T4_Decompress(yf[2+2*(len_t1+len_t2)+len_t3:],nso)
 
         # Setting up for next loop
         mu_0 = mu_f
@@ -522,21 +537,37 @@ def main():
             e_nuc + EnergyHF(h1, x, y)
         )
 
-        e_1, e_2, o_1, o_2, o_12 = mpenergycov(
-            h1, eri, t1, t2, s1, s2, s3, s4, x, y
+        e_1, e_2, o_1, o_2, o_3, o_4 = mpenergycov(
+            h1, eri, t0, t1, t2, s0, s1, s2, s3, s4, x, y
         )
 
-        e_mp1 = np.append(e_mp1, e_hf[-1] + e_1) / (1+o_1)
-        e_mp2 = np.append(e_mp2, e_mp1[-1] + e_2) / (1+o_1+o_12+o_2)
+        # XXX: Checkpoint
+        # print('energy correction at order 1: {}'.format(e_1))
+        # print('energy correction at order 2: {}'.format(e_2))
+        # print('overlap correction at order 3: {}'.format(o_3))
+        # print('overlap correction at order 4: {}'.format(o_4))
+        # pdb.set_trace()
 
-        ov_mp1 = np.append(ov_mp1, o_1)
+        e_mp1 = np.append(e_mp1, ( e_hf[-1] + e_1 ) / (1+o_2) )
+        e_mp2 = np.append(e_mp2, ( e_hf[-1] + e_1 + e_2 ) / (1+o_2+o_3) )
+
+        # ov_mp1 = np.append(ov_mp1, o_1)
         ov_mp2 = np.append(ov_mp2, o_2)
-        ov_mp12 = np.append(ov_mp2, o_12)
-        print('The value of the <1|2> = {}'.format(o_12))
+        ov_mp3 = np.append(ov_mp3, o_3)
+        ov_mp4 = np.append(ov_mp4, o_4)
+        print('The value of the <0|1> = {}'.format(o_1))
 
         mu_cc = np.append(mu_cc,mu_f)
 
         n_exp = np.append(n_exp,num)
+        t0_rms = np.append(
+            t0_rms,
+            t0
+        )
+        s0_rms = np.append(
+            s0_rms,
+            s0
+        )
         t1_rms = np.append(
             t1_rms,
             np.sqrt(np.mean(t1**2))
@@ -553,18 +584,26 @@ def main():
             s2_rms,
             np.sqrt(np.mean(s2**2))
         )
+        s3_rms = np.append(
+            s3_rms,
+            np.sqrt(np.mean(s3**2))
+        )
+        s4_rms = np.append(
+            s4_rms,
+            np.sqrt(np.mean(s4**2))
+        )
 
         vals = [
-            beta_grid[-1], e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1],t1_rms[-1],\
-            s1_rms[-1], t2_rms[-1], s2_rms[-1], n_exp[-1], ystack[-1]
+            beta_grid[-1], e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1],t0_rms[-1],t1_rms[-1],\
+            s0_rms[-1],s1_rms[-1], t2_rms[-1], s2_rms[-1], s3_rms[-1], s4_rms[-1], n_exp[-1], ystack[-1]
         ]
 
         updateh5(dset_list, vals, j)
 
         print('At beta = {}'.format(b_span[-1]))
         print('mu = {}'.format(mu_f))
-        print('N_elec = {}'.format(n_exp[j]))
-        print('ECC = {}'.format(e_mp2[j]))
+        print('N_elec = {}'.format(n_exp[-1]))
+        print('ECC = {}'.format(e_mp2[-1]))
         print('----------------------------------------------\n')
         j += 1
 

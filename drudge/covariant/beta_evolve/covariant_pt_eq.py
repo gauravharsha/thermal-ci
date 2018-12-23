@@ -1,6 +1,6 @@
 """
     Date: Dec 2, 2018
-    Modified: Dec 12, 2018
+    Modified: Dec 22, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
     This is covariant version - i.e. the reference keeps evolving
     Location: Documents/projects/Molecules/thermal_covariant/drudge/ccd/
@@ -14,6 +14,7 @@ from ThermofieldDrudge import *
 from sympy import *
 from gristmill import *
 import time
+import pdb
 
 delK = KroneckerDelta
 
@@ -122,10 +123,12 @@ hamth_time = time.time()
 """-------------------------------------------------------------------------"""
 
 # First order perturbation wavefunction description
+t0 = Symbol('t0')
 t1 = IndexedBase('t1')
 t2 = IndexedBase('t2')
 
 # Second order perturbation wavefunction description
+s0 = Symbol('s0')
 s1 = IndexedBase('s1')
 s2 = IndexedBase('s2')
 s3 = IndexedBase('s3')
@@ -144,10 +147,8 @@ dr2.set_symm(s2,
 dr2.set_symm(s3,
     Perm([1,0,2,3,4,5],NEG),
     Perm([0,2,1,3,4,5],NEG),
-    Perm([2,0,1,3,4,5],IDENT),
     Perm([0,1,2,4,3,5],NEG),
     Perm([0,1,2,3,5,4],NEG),
-    Perm([0,1,2,5,4,3],IDENT),
 )
 
 dr2.set_symm(s4,
@@ -187,8 +188,8 @@ S4 = dr2.einst(
         * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 576
 )
 
-Tvec = dr2.simplify(T1 + T2)
-Svec = dr2.simplify(S1 + S2 + S3 + S4)
+Tvec = dr2.simplify(t0 + T1 + T2)
+Svec = dr2.simplify(s0 + S1 + S2 + S3 + S4)
 
 #########################################################################
 ##      Perturbation Theory equation looks like                        ##
@@ -201,12 +202,12 @@ Svec = dr2.simplify(S1 + S2 + S3 + S4)
 # First order theory
 mp1_rhs_op_mf = dr2.simplify( (Tvec | ham_th1) )
 mp1_rhs_op_pot = dr2.simplify( ham_th2 )
-mp1_rhs_op = dr2.simplify((1/2)*( mp1_rhs_op_mf - mp1_rhs_op_pot ))
+mp1_rhs_op = dr2.simplify(( mp1_rhs_op_mf - mp1_rhs_op_pot ) / 2)
 
 # Second order theory
 mp2_rhs_op_mf = dr2.simplify( (Svec | ham_th1) )
 mp2_rhs_op_pot = dr2.simplify( ham_th2*Tvec )
-mp2_rhs_op = dr2.simplify((1/2)*( mp2_rhs_op_mf - mp2_rhs_op_pot ))
+mp2_rhs_op = dr2.simplify(( mp2_rhs_op_mf - mp2_rhs_op_pot ) / 2)
 
 print('\n\n--------------------------------------------------------------------------------')
 print('RHS operator terms evaluated')
@@ -241,41 +242,43 @@ proj_s4 = (
         c_[s,UP] * c_[r,UP] * c_[q,UP] * c_[p,UP]
 )
 
-rt1_th = dr2.memoize(lambda: dr2.simplify(proj_t1 * (mp1_rhs_op)),'RTpa.pickle')
-rt2_th = dr2.memoize(lambda: dr2.simplify(proj_t2 * (mp1_rhs_op)),'RTpqab.pickle')
+rt1_th = dr2.memoize( lambda: dr2.simplify(proj_t1 * (mp1_rhs_op)),'RTpa.pickle')
+rt2_th = dr2.memoize( lambda: dr2.simplify(proj_t2 * (mp1_rhs_op)),'RTpqab.pickle')
 
-rs1_th = dr2.memoize(lambda: dr2.simplify(proj_s1 * (mp2_rhs_op)),'RSpa.pickle')
-rs2_th = dr2.memoize(lambda: dr2.simplify(proj_s2 * (mp2_rhs_op)),'RSpqab.pickle')
-rs3_th = dr2.memoize(lambda: dr2.simplify(proj_s3 * (mp2_rhs_op)),'RSpqrabc.pickle')
-rs4_th = dr2.memoize(lambda: dr2.simplify(proj_s4 * (mp2_rhs_op)),'RSpqrsabcd.pickle')
+rs1_th = dr2.memoize( lambda: dr2.simplify(proj_s1 * (mp2_rhs_op)),'RSpa.pickle')
+rs2_th = dr2.memoize( lambda: dr2.simplify(proj_s2 * (mp2_rhs_op)),'RSpqab.pickle')
+rs3_th = dr2.memoize( lambda: dr2.simplify(proj_s3 * (mp2_rhs_op)),'RSpqrabc.pickle')
+rs4_th = dr2.memoize( lambda: dr2.simplify(proj_s4 * (mp2_rhs_op)),'RSpqrsabcd.pickle')
 
 # Derive the working equations by projection
-rt_1body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rt1_th )))
-rt_2body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rt2_th )))
+rt_0body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( mp1_rhs_op ) ), 'rt0_eqn.pickle' )
+rt_1body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( rt1_th ))), 'rt1_eqn.pickle')
+rt_2body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( rt2_th ))), 'rt2_eqn.pickle')
 
-rs_1body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs1_th )))
-rs_2body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs2_th )))
-rs_3body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs3_th )))
-rs_4body = dr2.simplify(dr2.eval_phys_vev( dr2.simplify( rs4_th )))
+rs_0body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( mp2_rhs_op ) ), 'rs0_eqn.pickle' )
+rs_1body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( rs1_th ))), 'rs1_eqn.pickle')
+rs_2body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( rs2_th ))), 'rs2_eqn.pickle')
+rs_3body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( rs3_th ))), 'rs3_eqn.pickle')
+rs_4body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( rs4_th ))), 'rs4_eqn.pickle')
 
 print('Equations obtained')
 
 # Confirming that the contractions are unity
-t1dag_t = dr2.simplify( proj_t1 * ( Tvec ) )
-t2dag_t = dr2.simplify( proj_t2 * ( Tvec ) )
-
-s1dag_s = dr2.simplify( proj_s1 * ( Svec ) )
-s2dag_s = dr2.simplify( proj_s2 * ( Svec ) )
-s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
-s4dag_s = dr2.simplify( proj_s4 * ( Svec ) )
-
-t1_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t1dag_t ) )
-t2_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t2dag_t ) )
-
-s1_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s1dag_s ) )
-s2_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s2dag_s ) )
-s3_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s3dag_s ) )
-s4_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s4dag_s ) )
+# t1dag_t = dr2.simplify( proj_t1 * ( Tvec ) )
+# t2dag_t = dr2.simplify( proj_t2 * ( Tvec ) )
+# 
+# s1dag_s = dr2.simplify( proj_s1 * ( Svec ) )
+# s2dag_s = dr2.simplify( proj_s2 * ( Svec ) )
+# s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
+# s4dag_s = dr2.simplify( proj_s4 * ( Svec ) )
+# 
+# t1_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t1dag_t ) )
+# t2_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t2dag_t ) )
+# 
+# s1_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s1dag_s ) )
+# s2_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s2dag_s ) )
+# s3_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s3dag_s ) )
+# s4_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s4dag_s ) )
 
 # T2 equation time
 t2eqn_time = time.time()
@@ -290,6 +293,10 @@ t2eqn_time = time.time()
 ###############################################################################
 
 
+rt0_eqn_in_dr = Tensor(
+    dr,
+    rt_0body.terms
+)
 rt1_eqn_in_dr = Tensor(
     dr,
     rt_1body.terms
@@ -299,6 +306,10 @@ rt2_eqn_in_dr = Tensor(
     rt_2body.terms
 )
 
+rs0_eqn_in_dr = Tensor(
+    dr,
+    rs_0body.terms
+)
 rs1_eqn_in_dr = Tensor(
     dr,
     rs_1body.terms
@@ -317,22 +328,29 @@ rs4_eqn_in_dr = Tensor(
 )
 
 # Now the actual optimization process
+rt0 = Symbol('rt0')
 rt1 = IndexedBase('rt1')
 rt2 = IndexedBase('rt2')
 
+rs0 = Symbol('rs0')
 rs1 = IndexedBase('rs1')
 rs2 = IndexedBase('rs2')
 rs3 = IndexedBase('rs3')
 rs4 = IndexedBase('rs4')
 
+# if rt1_eqn_in_dr != []:
+
 work_eqn = [
+    dr.define(rt0, rt0_eqn_in_dr),
     dr.define(rt1[p,a], rt1_eqn_in_dr),
     dr.define(rt2[p,q,a,b], rt2_eqn_in_dr),
+    dr.define(rs0, rs0_eqn_in_dr),
     dr.define(rs1[p,a], rs1_eqn_in_dr),
     dr.define(rs2[p,q,a,b], rs2_eqn_in_dr),
     dr.define(rs3[p,q,r,a,b,c], rs3_eqn_in_dr),
     dr.define(rs4[p,q,r,s,a,b,c,d], rs4_eqn_in_dr)
 ]
+# work_eqn = []
 
 # Original Un-optimized cost
 orig_cost = get_flop_cost(work_eqn, leading=True)
@@ -340,11 +358,13 @@ init_printing()
 print(orig_cost)
 
 # Optimizing
-eval_seq = optimize(
-    work_eqn,
-    interm_fmt = 'tau{}'
-)
-# eval_seq = work_eqn
+try:
+    eval_seq = optimize(
+        work_eqn,
+        interm_fmt = 'tau{}'
+    )
+except ValueError:
+    eval_seq = work_eqn
 
 print(len(eval_seq))
 opt_cost = get_flop_cost(eval_seq, leading=True)
@@ -377,11 +397,11 @@ with dr.report('cov_pt.html','Thermal Perturbation Theory') as rep:
     rep.add('MP2 2 body eqn',rs_2body)
     rep.add('MP2 3 body eqn',rs_3body)
     rep.add('MP2 4 body eqn',rs_4body)
-    rep.add('Tdag1 * T',t1_dag_t_exp)
-    rep.add('Tdag2 * T',t2_dag_t_exp)
-    rep.add('Sdag1 * S',s1_dag_s_exp)
-    rep.add('Sdag2 * S',s2_dag_s_exp)
-    rep.add('Sdag3 * S',s3_dag_s_exp)
+    # rep.add('Tdag1 * T',t1_dag_t_exp)
+    # rep.add('Tdag2 * T',t2_dag_t_exp)
+    # rep.add('Sdag1 * S',s1_dag_s_exp)
+    # rep.add('Sdag2 * S',s2_dag_s_exp)
+    # rep.add('Sdag3 * S',s3_dag_s_exp)
     rep.add('Symm Check',dr2.simplify(dr2.einst(
         (t2[a,b] + t2[b,a])*c_dag[a,UP]*c_dag[b,UP]
         )))

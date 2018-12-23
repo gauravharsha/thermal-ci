@@ -3,38 +3,9 @@ from itertools import permutations
 from scipy.misc import comb
 from PyPTLib import *
 from CovMuPT2 import *
-from OpDerMP2 import *
-# from CovBetaPT2 import *
+from OpDerLib import *
 
-def parity(perm,perm0):
-    """
-    Here we assume that the permutation is either 3 or 4 characters long
-    """
-    if len(perm)!=len(perm0):
-        raise(ValueError,'Input strings must of the same length',(perm,perm0))
-    elif len(perm)==4:
-        loc0 = np.linspace(0,3,4)
-        loc1 = loc0
-        for i in range(4):
-            loc1[i] = perm.find(perm0[i])
-        pdiff = np.sum( np.abs(loc1 - loc0) )
-        if pdiff%2 == 0:
-            return 1
-        else:
-            return -1
-    elif len(perm)==3:
-        loc0 = np.linspace(0,2,3)
-        loc1 = loc0
-        for i in range(3):
-            loc1[i] = perm.find(perm0[i])
-        pdiff = np.sum( np.abs(loc1 - loc0) )
-        if pdiff%2 == 0:
-            return -1
-        else:
-            return 1
-    else:
-        raise(ValueError,'One or both of the input lengths not supported',(perm,perm0))
-
+import pdb
 
 
 def T2_Decompress(T2_Compressed,NSO):
@@ -49,7 +20,9 @@ def T2_Decompress(T2_Compressed,NSO):
     which is done by this function
     """
     if np.size(T2_Compressed) != int(comb(NSO,2)**2):
-        raise(ValueError,'Invalid Size of the compressed T2 array',t2_compr)
+        # XXX: 
+        # pdb.set_trace()
+        raise(ValueError,'Invalid Size of the compressed array T2_Compressed')
 
     t2 = np.zeros((NSO,NSO,NSO,NSO))
     m = 0
@@ -105,7 +78,7 @@ def T2_Compress(T2):
                         T2_compressed[m] = val
                         m += 1
                     else:
-                        raise(ValueError,'Incorrect Symmetry for the input Tensor',T2)
+                        raise(ValueError,'Incorrect Symmetry for the input Tensor T2')
     
     return T2_compressed
 
@@ -122,7 +95,7 @@ def T3_Decompress(T3_Compressed,NSO):
     which is done by this function
     """
     if np.size(T3_Compressed) != int(comb(NSO,3)**2):
-        raise(ValueError,'Invalid Size of the compressed T4 array',T4_Compressed)
+        raise(ValueError,'Invalid Size of the compressed T4 array T3_Compressed')
 
     t3 = np.zeros((NSO,NSO,NSO,NSO,NSO,NSO))
     m = 0
@@ -130,6 +103,12 @@ def T3_Decompress(T3_Compressed,NSO):
     dn_str = 'abc'
     perm_up = [''.join(p) for p in permutations(up_str)]
     perm_dn = [''.join(p) for p in permutations(dn_str)]
+
+    parity3 = {}
+    with open('perm3') as f3:
+        for line in f3:
+            (key,val) = line.split()
+            parity3[str(key)] = int(val)
 
     for i in range(NSO):
         for j in range(i+1,NSO):
@@ -142,9 +121,11 @@ def T3_Decompress(T3_Compressed,NSO):
                             for p_up in perm_up:
                                 for p_dn in perm_dn:
                                     exec(
-                                        "t3[%s,%s,%s,%s,%s,%s] = %d*%d*%d",
-                                        (p_up[0],p_up[1],p_up[2],p_dn[0],p_dn[1],p_dn[2],
-                                            parity(p_up,up_str), parity(p_dn,dn_str), val)
+                                        "t3[%s,%s,%s,%s,%s,%s] = %d"
+                                            %(
+                                                p_up[0],p_up[1],p_up[2],p_dn[0],p_dn[1],p_dn[2],
+                                                parity3[p_up] * parity3[p_dn] * val
+                                            )
                                     )
                             m += 1
 
@@ -168,6 +149,8 @@ def T3_Compress(T3):
     m = 0
     T3_compressed = np.zeros( int( comb(NSO,3)**2 ) )
 
+    chk = [False,False,False,False,False,False]
+
     for i in range(NSO):
         for j in range(i+1,NSO):
             for k in range(j+1,NSO):
@@ -183,13 +166,14 @@ def T3_Compress(T3):
 
                             chk[3] = np.isclose(T3[i,j,k,b,a,c],-val,rtol=1e-7)
                             chk[4] = np.isclose(T3[i,j,k,a,c,b],-val,rtol=1e-7)
-                            chk[5] = np.isclose(T3[i,j,k,c,a,b],-val,rtol=1e-7)
+                            chk[5] = np.isclose(T3[i,j,k,c,a,b],val,rtol=1e-7)
 
-                            if all(chk):
+                            # XXX: pdb.set_trace()
+                            if all(chkval == True for chkval in chk):
                                 T3_compressed[m] = val
                                 m += 1
                             else:
-                                raise(ValueError,'Incorrect Symmetry for the input Tensor',T3)
+                                raise(ValueError,'Incorrect Symmetry for the input Tensor T3')
     
     return T3_compressed
 
@@ -205,7 +189,7 @@ def T4_Decompress(T4_Compressed,NSO):
     which is done by this function
     """
     if np.size(T4_Compressed) != int(comb(NSO,4)**2):
-        raise(ValueError,'Invalid Size of the compressed T4 array',T4_Compressed)
+        raise(ValueError,'Invalid Size of the compressed T4 array T4_Compressed')
 
     t4 = np.zeros((NSO,NSO,NSO,NSO,NSO,NSO,NSO,NSO))
     m = 0
@@ -213,6 +197,12 @@ def T4_Decompress(T4_Compressed,NSO):
     dn_str = 'abcd'
     perm_up = [''.join(p) for p in permutations(up_str)]
     perm_dn = [''.join(p) for p in permutations(dn_str)]
+
+    parity4 = {}
+    with open('perm4') as f4:
+        for line in f4:
+            (key,val) = line.split()
+            parity4[str(key)] = int(val)
 
     for i in range(NSO):
         for j in range(i+1,NSO):
@@ -227,9 +217,9 @@ def T4_Decompress(T4_Compressed,NSO):
                                     for p_up in perm_up:
                                         for p_dn in perm_dn:
                                             exec(
-                                                "t4[%s,%s,%s,%s,%s,%s,%s,%s] = %d*%d*%d",
-                                                (p_up[0],p_up[1],p_up[2],p_up[3],p_dn[0],p_dn[1],p_dn[2],p_dn[3],
-                                                    parity(p_up,up_str), parity(p_dn,dn_str), val)
+                                                "t4[%s,%s,%s,%s,%s,%s,%s,%s] = %d"
+                                                %(p_up[0],p_up[1],p_up[2],p_up[3],p_dn[0],p_dn[1],p_dn[2],p_dn[3],
+                                                    parity4[p_up] * parity4[p_dn] * val)
                                             )
                                     m += 1
 
@@ -255,6 +245,7 @@ def T4_Compress(T4):
     T4_compressed = np.zeros( int( comb(NSO,4)**2 ) )
 
     chk = [False,False,False,False,False,False]
+    # XXX: pdb.set_trace()
 
     for i in range(NSO):
         for j in range(i+1,NSO):
@@ -265,7 +256,7 @@ def T4_Compress(T4):
                             for c in range(b+1,NSO):
                                 for d in range(c+1,NSO):
 
-                                    val = T4[i,j,k,a,b,c,d]
+                                    val = T4[i,j,k,l,a,b,c,d]
 
                                     chk[0] = np.isclose(T4[j,i,k,l,a,b,c,d],-val,rtol=1e-7)
                                     chk[1] = np.isclose(T4[i,j,l,k,a,b,c,d],-val,rtol=1e-7)
@@ -275,11 +266,12 @@ def T4_Compress(T4):
                                     chk[4] = np.isclose(T4[i,j,k,l,a,b,d,c],-val,rtol=1e-7)
                                     chk[5] = np.isclose(T4[i,j,k,l,a,c,b,d],-val,rtol=1e-7)
 
-                                    if all(chk):
+                                    # XXX: pdb.set_trace()
+                                    if all(chkval == True for chkval in chk):
                                         T4_compressed[m] = val
                                         m += 1
                                     else:
-                                        raise(ValueError,'Incorrect Symmetry for the input Tensor',T2)
+                                        raise(ValueError,'Incorrect Symmetry for the input Tensor T2')
     
     return T4_compressed
 
@@ -324,21 +316,18 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     lent4 = int( comb(Nso,4)**2 )
 
     # Extracting amps from input
-    T1 = np.reshape(TSamps[0:lent1], (Nso,Nso))
-    S1 = np.reshape(TSamps[lent1:2*lent1], (Nso,Nso))
-    T2 = T2_Decompress(TSamps[2*lent1:2*lent1+lent2],Nso)
-    S2 = T2_Decompress(TSamps[2*lent1 + lent2:2*lent1 + 2*lent2],Nso)
-    S3 = T3_Decompress(TSamps[2*(lent1 + lent2):2*(lent1 + lent2) + lent3],Nso)
-    S4 = T4_Decompress(TSamps[2*(lent1 + lent2) + lent3:],Nso)
+    T0 = TSamps[0]
+    S0 = TSamps[1]
+    T1 = np.reshape(TSamps[2:2+lent1], (Nso,Nso))
+    S1 = np.reshape(TSamps[2+lent1:2+2*lent1], (Nso,Nso))
+    T2 = T2_Decompress(TSamps[2+2*lent1:2+2*lent1+lent2],Nso)
+    S2 = T2_Decompress(TSamps[2+2*lent1 + lent2:2+2*(lent1 + lent2)],Nso)
+    S3 = T3_Decompress(TSamps[2+2*(lent1 + lent2):2+2*(lent1 + lent2) + lent3],Nso)
+    S4 = T4_Decompress(TSamps[2+2*(lent1 + lent2) + lent3:],Nso)
     
-    dt1_dmu, ds1_dmu, ds2_dmu, ds3_dmu = covmupt2(
-        T1, T2, U, V
+    dt0_dmu, dt1_dmu, ds0_dmu, ds1_dmu, ds2_dmu, ds3_dmu = covmupt2(
+        T0, T1, T2, U, V
     )
-
-    dt1_dmu *= 1/2
-    ds1_dmu *= 1/2
-    ds2_dmu *= 1/2
-    ds3_dmu *= 1/2
     
     #####################################################
     # TODO: This box is not for the MP - CHANGE         #
@@ -352,10 +341,14 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     #####################################################
 
     # First two arguments are beta, mu -- here we do not want any effect of either
-    t1der,s1der = opdermp2(1, 0, OneH, T2, S2, U, V)[2:]
+    t0der, t1der, s0der, s1der, s3der = MuDerMP(1, T1, T2, S1, S2, S4, U, V)
 
+    dt0_dmu -= t0der
     dt1_dmu -= t1der 
+
+    ds0_dmu -= s0der
     ds1_dmu -= s1der 
+    ds3_dmu -= s3der 
 
     # Reshape the array as vectors and compress to send them out.
     dt1_dmu = np.reshape(dt1_dmu,(Nso)**2)
@@ -365,10 +358,10 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     dt2_dmu = T2_Compress(T2*0)
     ds4_dmu = T4_Compress(S4*0)
 
-    out = np.concatenate( (dt1_dmu, ds1_dmu, dt2_dmu, ds2_dmu, ds3_dmu, ds4_dmu) )
+    out = np.concatenate( ([dt0_dmu],[ds0_dmu],dt1_dmu, ds1_dmu, dt2_dmu, ds2_dmu, ds3_dmu, ds4_dmu) )
     return out
 
-def beta_evolve(Tau, TSamps, Mu, Alpha, OneH, Eri):
+def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     """
     Function that returns the RHS of the Differential equation set up
     Inputs:     
@@ -405,15 +398,17 @@ def beta_evolve(Tau, TSamps, Mu, Alpha, OneH, Eri):
     lent4 = int( comb(Nso,4)**2 )
 
     # Extracting amps from input
-    T1 = np.reshape(TSamps[0:lent1], (Nso,Nso))
-    S1 = np.reshape(TSamps[lent1:2*lent1], (Nso,Nso))
-    T2 = T2_Decompress(TSamps[2*lent1:2*lent1+lent2],Nso)
-    S2 = T2_Decompress(TSamps[2*lent1 + lent2:2*lent1 + 2*lent2],Nso)
-    S3 = T3_Decompress(TSamps[2*(lent1 + lent2):2*(lent1 + lent2) + lent3],Nso)
-    S4 = T4_Decompress(TSamps[2*(lent1 + lent2) + lent3:],Nso)
+    T0 = TSamps[0]
+    S0 = TSamps[1]
+    T1 = np.reshape(TSamps[2:2+lent1], (Nso,Nso))
+    S1 = np.reshape(TSamps[2+lent1:2+2*lent1], (Nso,Nso))
+    T2 = T2_Decompress(TSamps[2+2*lent1:2+2*lent1+lent2],Nso)
+    S2 = T2_Decompress(TSamps[2+2*lent1 + lent2:2+2*(lent1 + lent2)],Nso)
+    S3 = T3_Decompress(TSamps[2+2*(lent1 + lent2):2+2*(lent1 + lent2) + lent3],Nso)
+    S4 = T4_Decompress(TSamps[2+2*(lent1 + lent2) + lent3:],Nso)
     
-    dt1_dtau, dt2_dtau, ds1_dtau, ds2_dtau, ds3_dtau, ds4_dtau = covbetapt2(
-        OneH, Eri, T1, T2, S1, S2, S3, S4, U, V
+    dt0_dtau, dt1_dtau, dt2_dtau, ds0_dtau, ds1_dtau, ds2_dtau, ds3_dtau, ds4_dtau = covbetapt2(
+        OneH, Eri, T0, T1, T2, S0, S1, S2, S3, S4, U, V
     )
 
     #####################################################
@@ -427,10 +422,14 @@ def beta_evolve(Tau, TSamps, Mu, Alpha, OneH, Eri):
     #                                                   #
     #####################################################
     # First two arguments are beta, mu -- here we do not want any effect of either
-    t1der,s1der = opdermp2(0, 0, OneH, T2, S2, U, V)[0:2]
+    t0der, t1der, s0der, s1der, s3der = BetaDerMP(OneH, 0, T1, T2, S1, S2, S4, U, V)
 
+    dt0_dtau -= t0der
     dt1_dtau -= t1der 
+
+    ds0_dtau -= s0der
     ds1_dtau -= s1der 
+    ds3_dtau -= s3der 
     
     # Reshape the array as vectors and compress to send them out.
     dt1_dtau = np.reshape(dt1_dtau,(Nso)**2)
@@ -440,7 +439,7 @@ def beta_evolve(Tau, TSamps, Mu, Alpha, OneH, Eri):
     ds3_dtau = T3_Compress(ds3_dtau)
     ds4_dtau = T4_Compress(ds4_dtau)
 
-    out = np.concatenate( (dt1_dtau, ds1_dtau, dt2_dtau, ds2_dtau, ds3_dtau, ds4_dtau) )
+    out = np.concatenate( ([dt0_dtau],[ds0_dtau],dt1_dtau, ds1_dtau, dt2_dtau, ds2_dtau, ds3_dtau, ds4_dtau) )
     return out
 
 def EnergyHF(OneH, U, V):
