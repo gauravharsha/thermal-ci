@@ -26,5 +26,5 @@
 
     sm3 += beta * einsum(
         "d,d,dpqrabcd->pqrabc", x, y, s4
-    )
+    ) / 2
 

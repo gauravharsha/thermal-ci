@@ -305,7 +305,7 @@ def main():
     # pdb.set_trace()
 
 
-    while beta_grid[j-1]<beta_f:
+    while beta_grid[j-1]<=beta_f:
 
         beta_2 = beta_grid[j-1] + beta_step
         b_span = [beta_grid[j-1], beta_2]
@@ -605,7 +605,11 @@ def main():
         print('N_elec = {}'.format(n_exp[-1]))
         print('ECC = {}'.format(e_mp2[-1]))
         print('----------------------------------------------\n')
+
         j += 1
+        if j == beta_pts-1:
+            break
+
 
     ode_time = time.time()
 

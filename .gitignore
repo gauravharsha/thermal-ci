@@ -1,8 +1,8 @@
 # Input Output data files and plots
-.pdf
-.h5
+*.pdf
+*.h5
 Input*
-./Output_cov/*
+/Output_cov/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

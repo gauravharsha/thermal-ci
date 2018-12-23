@@ -42,9 +42,9 @@
 
     sb3 += mu * einsum(
         "d,d,dpqrabcd->pqrabc", x, y, s4
-    )
+    ) / 2
 
     sb3 -= einsum(
         "d,d,d,dpqrabcd->pqrabc", e0, x, y, s4
-    )
+    ) / 2
 

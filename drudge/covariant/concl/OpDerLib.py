@@ -47,15 +47,15 @@ def BetaDerMP(e0, mu, t1, t2, s1, s2, s4, x, y):
 
     sb3 += mu * einsum(
         "d,d,dpqrabcd->pqrabc", x, y, s4
-    )
+    ) / 2
 
     sb3 -= einsum(
         "d,d,d,dpqrabcd->pqrabc", e0, x, y, s4
-    )
+    ) / 2
 
     return tb0, tb1, sb0, sb1, sb3
 
-def MuDerMP(e0, beta, t1, t2, s1, s2, s4, x, y):
+def MuDerMP(beta, t1, t2, s1, s2, s4, x, y):
     na = len(x)
 
     tm0 = 0
@@ -86,7 +86,6 @@ def MuDerMP(e0, beta, t1, t2, s1, s2, s4, x, y):
 
     sm3 += beta * einsum(
         "d,d,dpqrabcd->pqrabc", x, y, s4
-    )
-
+    ) / 2
 
     return tm0, tm1, sm0, sm1, sm3
