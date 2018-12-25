@@ -1,6 +1,6 @@
 """
     Date: Dec 2, 2018
-    Modified: Dec 12, 2018
+    Modified: Dec 23, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
     This is covariant version - i.e. the reference keeps evolving
 """
@@ -97,8 +97,6 @@ print('\nThermal Hamiltonian has {} 3 or more body terms'.format(
     ham_th_2body.n_terms
     )
 )
-
-en_rhf = dr2.simplify(dr2.eval_phys_vev( ham_th ))
 
 # Thermal Hamiltonian Time
 hamth_time = time.time()

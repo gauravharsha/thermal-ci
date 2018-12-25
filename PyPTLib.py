@@ -984,9 +984,9 @@ def mpenergycov(e0, eri, t0, t1, t2, s0, s1, s2, s3, s4, x, y):
 
     tau10 += 4*tau8 
 
-    ov1 = t0 + s0
+    ov1 = 2*t0
 
-    ov2 = 0
+    ov2 = 2*s0
 
     ov2 += tau8
 

@@ -38,6 +38,16 @@
         "a,a,apaq->pq", x, y, s2
     ) / 2
 
+    sb2 = zeros((na, na, na, na))
+
+    sb2 += einsum(
+        "a,a,a,apqars->pqrs", e0, x, y, s3
+    ) / 2
+
+    sb2 -= mu * einsum(
+        "a,a,apqars->pqrs", x, y, s3
+    ) / 2
+
     sb3 = zeros((na, na, na, na, na, na))
 
     sb3 += mu * einsum(

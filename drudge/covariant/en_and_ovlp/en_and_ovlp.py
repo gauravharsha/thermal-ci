@@ -1,6 +1,6 @@
 """
     Date: Dec 4, 2018
-    Modified: Dec 20, 2018
+    Modified: Dec 24, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
     This is covariant version - i.e. the reference keeps evolving
     Location: Documents/projects/Molecules/thermal_covariant/drudge/ccd/

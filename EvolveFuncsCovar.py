@@ -310,7 +310,7 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     V = np.exp( (-Tau*OneH)/2)*U*np.sqrt(Alpha)
 
     # lengths of different t and s tensors
-    lent1 = int( Nso**2 )
+    lent1 = int( comb(Nso,1)**2 )
     lent2 = int( comb(Nso,2)**2 )
     lent3 = int( comb(Nso,3)**2 )
     lent4 = int( comb(Nso,4)**2 )
@@ -330,25 +330,28 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     )
     
     #####################################################
-    # TODO: This box is not for the MP - CHANGE         #
-    # DERIVATIVE: exp(-T) d exp(T)/dMu                  #
+    # DERIVATIVE: d T / dMu                             #
     # We use the following notation                     #
     #                                                   #
-    #   F00 = <0| e^(-T) d e^(T) / d Mu |0>             #
-    #   F10 = <1| e^(-T) d e^(T) / d Mu |0>             #
-    #   F20 = <2| e^(-T) d e^(T) / d Mu |0>             #
+    #   F00 = <0|  d(T) / d Mu |0>                      #
+    #   F10 = <1|  d(T) / d Mu |0>                      #
+    #   F20 = <2|  d(T) / d Mu |0>                      #
     #                                                   #
     #####################################################
 
-    # First two arguments are beta, mu -- here we do not want any effect of either
-    t0der, t1der, s0der, s1der, s3der = MuDerMP(1, T1, T2, S1, S2, S4, U, V)
+    # NOTE: The alpha / mu derivatives do not count here because the reference
+    #       does not depend, in any way, on the chemical potential / alpha, and
+    #       therefore, neither does the HFB transformation
 
-    dt0_dmu -= t0der
-    dt1_dmu -= t1der 
+    # t0der, t1der, s0der, s1der, s2der, s3der = MuDerMP(1, T1, T2, S1, S2, S3, S4, U, V)
 
-    ds0_dmu -= s0der
-    ds1_dmu -= s1der 
-    ds3_dmu -= s3der 
+    # dt0_dmu -= t0der
+    # dt1_dmu -= t1der 
+
+    # ds0_dmu -= s0der
+    # ds1_dmu -= s1der 
+    # ds2_dmu -= s2der
+    # ds3_dmu -= s3der 
 
     # Reshape the array as vectors and compress to send them out.
     dt1_dmu = np.reshape(dt1_dmu,(Nso)**2)
@@ -392,7 +395,7 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     V = np.exp( (-Tau*OneH)/2)*U*np.sqrt(Alpha)
 
     # lengths of different t and s tensors
-    lent1 = int( Nso**2 )
+    lent1 = int( comb(Nso,1)**2 )
     lent2 = int( comb(Nso,2)**2 )
     lent3 = int( comb(Nso,3)**2 )
     lent4 = int( comb(Nso,4)**2 )
@@ -422,13 +425,14 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     #                                                   #
     #####################################################
     # First two arguments are beta, mu -- here we do not want any effect of either
-    t0der, t1der, s0der, s1der, s3der = BetaDerMP(OneH, 0, T1, T2, S1, S2, S4, U, V)
+    t0der, t1der, s0der, s1der, s2der, s3der = BetaDerMP(OneH, 0, T1, T2, S1, S2, S3, S4, U, V)
 
     dt0_dtau -= t0der
-    dt1_dtau -= t1der 
+    dt1_dtau -= t1der
 
     ds0_dtau -= s0der
     ds1_dtau -= s1der 
+    ds2_dtau -= s2der
     ds3_dtau -= s3der 
     
     # Reshape the array as vectors and compress to send them out.

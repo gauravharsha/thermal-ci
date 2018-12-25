@@ -22,6 +22,12 @@
         "a,a,apaq->pq", x, y, s2
     ) / 2
 
+    sm2 = zeros((na, na, na, na))
+
+    sm2 -= beta * einsum(
+        "a,a,apqars->pqrs", x, y, s3
+    ) / 2
+
     sm3 = zeros((na, na, na, na, na, na))
 
     sm3 += beta * einsum(

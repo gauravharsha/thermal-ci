@@ -1,6 +1,6 @@
 """
     Date: Dec 4, 2018
-    Modified: Dec 19, 2018
+    Modified: Dec 25, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal PT
     This is covariant version - i.e. the reference keeps evolving
     Location: h2_thermal/v3/
@@ -198,35 +198,23 @@ dS2_dMu = Tensor(
 # Derivatives of the S3 operator part
 dS3_dBeta = dr2.einst( s3[a,b,c,i,j,k] *
     (
-        ( e0[a] - mu ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( e0[b] - mu ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( e0[c] - mu ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( e0[k] - mu ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( e0[j] - mu ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 -
-        ( e0[i] - mu ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
+        ( e0[a] - mu ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
+        ( e0[b] - mu ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
+        ( e0[c] - mu ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
+        ( e0[k] - mu ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
+        ( e0[j] - mu ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 -
+        ( e0[i] - mu ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
     ) / 36
 )
 
 dS3_dMu = dr2.einst( s3[a,b,c,i,j,k] *
     (
-        ( -Beta ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( -Beta ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( -Beta ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-            * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
+        ( -Beta ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
+        ( -Beta ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
+        ( -Beta ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
+        ( Beta ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
+        ( Beta ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 +
+        ( Beta ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
     ) / 36
 )
 
@@ -300,28 +288,16 @@ proj_s4 = (
 dT_dBeta_1body = dr2.simplify( proj_t1 * dT_dBeta )
 dT_dMu_1body = dr2.simplify( proj_t1 * dT_dMu )
 
-dS_dBeta_1body = Tensor(
-    dr2,
-    dT_dBeta_1body.subst_all(t2s_defs).terms
-)
-dS_dMu_1body = Tensor(
-    dr2,
-    dT_dMu_1body.subst_all(t2s_defs).terms
-)
+dS_dBeta_1body = dr2.simplify( proj_t1 * dS_dBeta )
+dS_dMu_1body = dr2.simplify( proj_t1 * dS_dMu )
 
 # Projected with proj_t2
 
 dT_dBeta_2body = dr2.simplify( proj_t2 * dT_dBeta )
 dT_dMu_2body = dr2.simplify( proj_t2 * dT_dMu )
 
-dS_dBeta_2body = Tensor(
-    dr2,
-    dT_dBeta_2body.subst_all(t2s_defs).terms
-)
-dS_dMu_2body = Tensor(
-    dr2,
-    dT_dMu_2body.subst_all(t2s_defs).terms
-)
+dS_dBeta_2body = dr2.simplify( proj_t2 * dS_dBeta )
+dS_dMu_2body = dr2.simplify( proj_t2 * dS_dMu )
 
 # Projected with proj_s3
 

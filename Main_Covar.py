@@ -192,7 +192,7 @@ def main():
 
     # Alpha Grid
     mu_0 = np.log(alpha)
-    mu_step_0 = +1e-3
+    mu_step_0 = +1e-2
     mu_f = mu_step_0
 
     n_data = 1
@@ -236,8 +236,8 @@ def main():
     s4_rms = np.zeros(n_data)
 
     e_hf[0] = E_hf
-    e_mp1[0] = (E_hf + e_1)/(1 + o_1 + o_2)
-    e_mp2[0] = (E_hf + e_1 + e_2)/(1 + o_1 + o_2 + o_3 + o_4)
+    e_mp1[0] = (E_hf + e_1)/(1 + o_1)
+    e_mp2[0] = (E_hf + e_1 + e_2)/(1 + o_1 + o_2)
     n_exp[0] = n_elec
 
     print('Thermal Hartree Fock Energy at T = Inf is :',E_hf)
@@ -326,7 +326,7 @@ def main():
             h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
         )
 
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
+        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
         print('\t\t\tNumber of particles before evolution = {}'.format(num))
 
         ############################### 
@@ -358,7 +358,7 @@ def main():
         n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
             h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
         )
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
+        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
 
         print('\n\t\t\tNew Beta = {}'.format(beta_2))
         print('\t\t\tNumber of particles after evolution = {}'.format(num))
@@ -396,8 +396,8 @@ def main():
             
             while np.sign(num - n_elec) == ndiff_sgn:
                 count += 1
-                if count > 500:
-                    print('Could not find the bracket after 1000 steps')
+                if count > 1000:
+                    print('Could not find the bracket after 6000 steps')
                     count = 0
                     exit()
                     break
@@ -428,7 +428,7 @@ def main():
                 n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
                     h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
+                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
 
                 # Finer grid if we are closer to n_elec
                 val = np.abs(num - n_elec) - ndiff_mag
@@ -496,7 +496,7 @@ def main():
                 n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
                     h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2 + o_3 + o_4)
+                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
 
 
                 if np.sign( num - n_elec ) == ndiff_sgn1:
@@ -607,7 +607,7 @@ def main():
         print('----------------------------------------------\n')
 
         j += 1
-        if j == beta_pts-1:
+        if j == beta_pts:
             break
 
 
