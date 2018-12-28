@@ -1,9 +1,12 @@
 import numpy as np
 from itertools import permutations
 from scipy.misc import comb
-from PyPTLib import *
-from CovMuPT2 import *
-from OpDerLib import *
+
+from CovMuPT import *
+from CovBetaPT import *
+from MuDerPT import *
+from BetaDerPT import *
+from EnAndOvlp import *
 
 import pdb
 
@@ -312,20 +315,13 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     # lengths of different t and s tensors
     lent1 = int( comb(Nso,1)**2 )
     lent2 = int( comb(Nso,2)**2 )
-    lent3 = int( comb(Nso,3)**2 )
-    lent4 = int( comb(Nso,4)**2 )
 
     # Extracting amps from input
     T0 = TSamps[0]
-    S0 = TSamps[1]
-    T1 = np.reshape(TSamps[2:2+lent1], (Nso,Nso))
-    S1 = np.reshape(TSamps[2+lent1:2+2*lent1], (Nso,Nso))
-    T2 = T2_Decompress(TSamps[2+2*lent1:2+2*lent1+lent2],Nso)
-    S2 = T2_Decompress(TSamps[2+2*lent1 + lent2:2+2*(lent1 + lent2)],Nso)
-    S3 = T3_Decompress(TSamps[2+2*(lent1 + lent2):2+2*(lent1 + lent2) + lent3],Nso)
-    S4 = T4_Decompress(TSamps[2+2*(lent1 + lent2) + lent3:],Nso)
+    T1 = np.reshape(TSamps[1:1+lent1], (Nso,Nso))
+    T2 = T2_Decompress(TSamps[1+lent1:],Nso)
     
-    dt0_dmu, dt1_dmu, ds0_dmu, ds1_dmu, ds2_dmu, ds3_dmu = covmupt2(
+    dt0_dmu, dt1_dmu, dt2_dmu = covmupt(
         T0, T1, T2, U, V
     )
     
@@ -343,6 +339,8 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     #       does not depend, in any way, on the chemical potential / alpha, and
     #       therefore, neither does the HFB transformation
 
+    # NOTE: The sequnce of code below is INCORRECT ANYWAY
+
     # t0der, t1der, s0der, s1der, s2der, s3der = MuDerMP(1, T1, T2, S1, S2, S3, S4, U, V)
 
     # dt0_dmu -= t0der
@@ -355,13 +353,9 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
 
     # Reshape the array as vectors and compress to send them out.
     dt1_dmu = np.reshape(dt1_dmu,(Nso)**2)
-    ds1_dmu = np.reshape(ds1_dmu,(Nso)**2)
-    ds2_dmu = T2_Compress(ds2_dmu)
-    ds3_dmu = T3_Compress(ds3_dmu)
-    dt2_dmu = T2_Compress(T2*0)
-    ds4_dmu = T4_Compress(S4*0)
+    dt2_dmu = T2_Compress(dt2_dmu)
 
-    out = np.concatenate( ([dt0_dmu],[ds0_dmu],dt1_dmu, ds1_dmu, dt2_dmu, ds2_dmu, ds3_dmu, ds4_dmu) )
+    out = np.concatenate( ([dt0_dmu], dt1_dmu, dt2_dmu) )
     return out
 
 def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
@@ -397,21 +391,14 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     # lengths of different t and s tensors
     lent1 = int( comb(Nso,1)**2 )
     lent2 = int( comb(Nso,2)**2 )
-    lent3 = int( comb(Nso,3)**2 )
-    lent4 = int( comb(Nso,4)**2 )
 
     # Extracting amps from input
     T0 = TSamps[0]
-    S0 = TSamps[1]
-    T1 = np.reshape(TSamps[2:2+lent1], (Nso,Nso))
-    S1 = np.reshape(TSamps[2+lent1:2+2*lent1], (Nso,Nso))
-    T2 = T2_Decompress(TSamps[2+2*lent1:2+2*lent1+lent2],Nso)
-    S2 = T2_Decompress(TSamps[2+2*lent1 + lent2:2+2*(lent1 + lent2)],Nso)
-    S3 = T3_Decompress(TSamps[2+2*(lent1 + lent2):2+2*(lent1 + lent2) + lent3],Nso)
-    S4 = T4_Decompress(TSamps[2+2*(lent1 + lent2) + lent3:],Nso)
+    T1 = np.reshape(TSamps[1:1+lent1], (Nso,Nso))
+    T2 = T2_Decompress(TSamps[1+lent1:],Nso)
     
-    dt0_dtau, dt1_dtau, dt2_dtau, ds0_dtau, ds1_dtau, ds2_dtau, ds3_dtau, ds4_dtau = covbetapt2(
-        OneH, Eri, T0, T1, T2, S0, S1, S2, S3, S4, U, V
+    dt0_dtau, dt1_dtau, dt2_dtau = covbetapt(
+        OneH, Eri, T0, T1, T2, U, V
     )
 
     #####################################################
@@ -425,28 +412,19 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     #                                                   #
     #####################################################
     # First two arguments are beta, mu -- here we do not want any effect of either
-    t0der, t1der, s0der, s1der, s2der, s3der = BetaDerMP(OneH, 0, T1, T2, S1, S2, S3, S4, U, V)
+    t0der, t1der = betaderpt(OneH, 0, T1, T2, U, V)
 
     dt0_dtau -= t0der
     dt1_dtau -= t1der
 
-    ds0_dtau -= s0der
-    ds1_dtau -= s1der 
-    ds2_dtau -= s2der
-    ds3_dtau -= s3der 
-    
     # Reshape the array as vectors and compress to send them out.
     dt1_dtau = np.reshape(dt1_dtau,(Nso)**2)
-    ds1_dtau = np.reshape(ds1_dtau,(Nso)**2)
     dt2_dtau = T2_Compress(dt2_dtau)
-    ds2_dtau = T2_Compress(ds2_dtau)
-    ds3_dtau = T3_Compress(ds3_dtau)
-    ds4_dtau = T4_Compress(ds4_dtau)
 
-    out = np.concatenate( ([dt0_dtau],[ds0_dtau],dt1_dtau, ds1_dtau, dt2_dtau, ds2_dtau, ds3_dtau, ds4_dtau) )
+    out = np.concatenate( ([dt0_dtau], dt1_dtau, dt2_dtau) )
     return out
 
-def EnergyHF(OneH, U, V):
+def EnAndOvlpHF(OneH, Eri, t0, U, V):
     """
     Returns the Mean-Field Thermal Energy Expectation Value at
     a given temperature BETA and chempot MU.
@@ -458,6 +436,14 @@ def EnergyHF(OneH, U, V):
     Nso = np.size(OneH,axis=0)
 
     # Energy from OneH
-    en = np.sum(OneH*V*V)
+    en = np.sum(OneH*V*V) * (t0**2)
 
-    return en
+    # Energy from Eri
+    for i in range(Nso):
+        for j in range(Nso):
+            en += (1/2)*Eri[i,j,i,j]*( t0 * V[i] * V[j] )**2
+
+    # OVerlap
+    ov = t0**2
+
+    return en, ov

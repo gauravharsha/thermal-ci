@@ -1,9 +1,10 @@
 """
     Date: Dec 4, 2018
     Modified: Dec 25, 2018
-    Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal PT
+    Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
     This is covariant version - i.e. the reference keeps evolving
-    Location: h2_thermal/v3/
+
+    Here, we compute the derivatives of the operator parts of the cluster operator
 """
 
 from pyspark import SparkContext
@@ -68,36 +69,9 @@ y = IndexedBase('y')
 t1 = IndexedBase('t1')
 t2 = IndexedBase('t2')
 
-# Second order perturbation wavefunction description
-s1 = IndexedBase('s1')
-s2 = IndexedBase('s2')
-s3 = IndexedBase('s3')
-s4 = IndexedBase('s4')
-
 dr2.set_symm(t2,
     Perm([1,0,2,3],NEG),
     Perm([0,1,3,2],NEG),
-)
-
-dr2.set_symm(s2,
-    Perm([1,0,2,3],NEG),
-    Perm([0,1,3,2],NEG),
-)
-
-dr2.set_symm(s3,
-    Perm([1,0,2,3,4,5],NEG),
-    Perm([0,2,1,3,4,5],NEG),
-    Perm([0,1,2,4,3,5],NEG),
-    Perm([0,1,2,3,5,4],NEG),
-)
-
-dr2.set_symm(s4,
-    Perm([1,0,2,3,4,5,6,7],NEG),
-    Perm([0,2,1,3,4,5,6,7],NEG),
-    Perm([0,1,3,2,4,5,6,7],NEG),
-    Perm([0,1,2,3,5,4,6,7],NEG),
-    Perm([0,1,2,3,4,6,5,7],NEG),
-    Perm([0,1,2,3,4,5,7,6],NEG),
 )
 
 T1 = dr2.einst(
@@ -108,34 +82,7 @@ T2 = dr2.einst(
     t2[a, b, c, d] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[d,DOWN] * c_dag[c,DOWN]) / 4 
 )
 
-S1 = dr2.einst(
-    s1[a, i] * ( (c_dag[a,UP] * c_dag[i,DOWN]) )
-)
-
-S2 = dr2.einst(
-    s2[a, b, i, j] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[j,DOWN] \
-        * c_dag[i,DOWN]) / 4 
-)
-
-S3 = dr2.einst(
-    s3[a, b, c, i, j, k] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-        * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 36
-)
-
-S4 = dr2.einst(
-    s4[a, b, c, d, i, j, k, l] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] \
-        * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 576
-)
-
 Tvec = dr2.simplify(T1 + T2)
-Svec = dr2.simplify(S1 + S2 + S3 + S4)
-
-t1_2_s1_def = dr.define( t1[a,b] , s1[a,b] )
-t2_2_s2_def = dr.define( t2[a,b,c,d] , s2[a,b,c,d] )
-t2s_defs = [
-    t1_2_s1_def,
-    t2_2_s2_def
-]
 
 # Derivatives of the T1 and S1 operator part
 dT1_dBeta = dr2.einst( t1[a, b] *
@@ -153,16 +100,6 @@ dT1_dMu = dr2.einst( t1[a, b] *
     )
 )
 dT1_dMu = dr2.simplify( dT1_dMu )
-
-dS1_dBeta = Tensor(
-    dr2,
-    dT1_dBeta.subst_all(t2s_defs).terms
-)
-
-dS1_dMu = Tensor(
-    dr2,
-    dT1_dMu.subst_all(t2s_defs).terms
-)
 
 # Derivatives of the T2 and S2 operator part
 dT2_dBeta = dr2.einst( t2[a, b, c, d] *
@@ -185,75 +122,10 @@ dT2_dMu = dr2.einst( t2[a, b, c, d] *
 )
 dT2_dMu = dr2.simplify( dT2_dMu )
 
-dS2_dBeta = Tensor(
-    dr2,
-    dT2_dBeta.subst_all(t2s_defs).terms
-)
-
-dS2_dMu = Tensor(
-    dr2,
-    dT2_dMu.subst_all(t2s_defs).terms
-)
-
-# Derivatives of the S3 operator part
-dS3_dBeta = dr2.einst( s3[a,b,c,i,j,k] *
-    (
-        ( e0[a] - mu ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( e0[b] - mu ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( e0[c] - mu ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( e0[k] - mu ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( e0[j] - mu ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 -
-        ( e0[i] - mu ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
-    ) / 36
-)
-
-dS3_dMu = dr2.einst( s3[a,b,c,i,j,k] *
-    (
-        ( -Beta ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( -Beta ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( -Beta ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
-    ) / 36
-)
-
-
-# Derivatives of the S4 operator part
-dS4_dBeta = dr2.einst( s4[a,b,c,d,i,j,k,l] *
-    (
-        ( e0[a] - mu ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( e0[b] - mu ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( e0[c] - mu ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( e0[d] - mu ) * x[d]*y[d] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_[d,DOWN] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( e0[l] - mu ) * x[l]*y[l] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_[l,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( e0[k] - mu ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( e0[j] - mu ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 -
-        ( e0[i] - mu ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
-    ) / 576
-)
-
-dS4_dMu = dr2.einst( s4[a,b,c,d,i,j,k,l] *
-    (
-        ( -Beta ) * x[a]*y[a] * c_[a,DOWN] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( -Beta ) * x[b]*y[b] * c_dag[a,UP] * c_[b,DOWN] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( -Beta ) * x[c]*y[c] * c_dag[a,UP] * c_dag[b,UP] * c_[c,DOWN] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( -Beta ) * x[d]*y[d] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_[d,DOWN] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 -
-        ( Beta ) * x[l]*y[l] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_[l,UP] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[k]*y[k] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_[k,UP] * c_dag[j,DOWN] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[j]*y[j] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_[j,UP] * c_dag[i,DOWN] / 2 +
-        ( Beta ) * x[i]*y[i] * c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_[i,UP] / 2
-    ) / 576
-)
-
-
 # Combining the T' derivatives
 
 dT_dBeta = dr2.simplify( dT1_dBeta + dT2_dBeta )
 dT_dMu = dr2.simplify( dT1_dMu + dT2_dMu )
-
-dS_dBeta = dr2.simplify( dS1_dBeta + dS2_dBeta + dS3_dBeta + dS4_dBeta)
-dS_dMu = dr2.simplify( dS1_dMu + dS2_dMu + dS3_dMu + dS4_dMu)
 
 # Various Tbar Computing Time
 Tder_bar_time = time.time()
@@ -271,43 +143,15 @@ proj_t2 = (
     c_[r,DOWN] * c_[s,DOWN] * c_[q,UP] * c_[p,UP]
 )
 
-proj_s1 = proj_t1
-proj_s2 = proj_t2
-
-proj_s3 = (
-    c_[a,DOWN] * c_[b,DOWN] * c_[c,DOWN] * c_[r,UP] * c_[q,UP] * c_[p,UP]
-)
-
-proj_s4 = (
-    c_[a,DOWN] * c_[b,DOWN] * c_[c,DOWN] * c_[d,DOWN] *\
-        c_[s,UP] * c_[r,UP] * c_[q,UP] * c_[p,UP]
-)
-
 # Projected with proj_t1
 
 dT_dBeta_1body = dr2.simplify( proj_t1 * dT_dBeta )
 dT_dMu_1body = dr2.simplify( proj_t1 * dT_dMu )
 
-dS_dBeta_1body = dr2.simplify( proj_t1 * dS_dBeta )
-dS_dMu_1body = dr2.simplify( proj_t1 * dS_dMu )
-
 # Projected with proj_t2
 
 dT_dBeta_2body = dr2.simplify( proj_t2 * dT_dBeta )
 dT_dMu_2body = dr2.simplify( proj_t2 * dT_dMu )
-
-dS_dBeta_2body = dr2.simplify( proj_t2 * dS_dBeta )
-dS_dMu_2body = dr2.simplify( proj_t2 * dS_dMu )
-
-# Projected with proj_s3
-
-dS_dBeta_3body = dr2.simplify( proj_s3 * dS_dBeta )
-dS_dMu_3body = dr2.simplify( proj_s3 * dS_dMu )
-
-# Projected with proj_s4
-
-dS_dBeta_4body = dr2.simplify( proj_s4 * dS_dBeta )
-dS_dMu_4body = dr2.simplify( proj_s4 * dS_dMu )
 
 # Calculating the vev
 
@@ -318,18 +162,6 @@ dT_dBeta_2body_eqn = dr2.simplify( dr2.eval_phys_vev( dT_dBeta_2body ) )
 dT_dMu_0body_eqn = dr2.simplify( dr2.eval_phys_vev( dT_dMu ) )
 dT_dMu_1body_eqn = dr2.simplify( dr2.eval_phys_vev( dT_dMu_1body ) )
 dT_dMu_2body_eqn = dr2.simplify( dr2.eval_phys_vev( dT_dMu_2body ) )
-
-dS_dBeta_0body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dBeta ) )
-dS_dBeta_1body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dBeta_1body ) )
-dS_dBeta_2body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dBeta_2body ) )
-dS_dBeta_3body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dBeta_3body ) )
-dS_dBeta_4body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dBeta_4body ) )
-
-dS_dMu_0body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dMu ) )
-dS_dMu_1body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dMu_1body ) )
-dS_dMu_2body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dMu_2body ) )
-dS_dMu_3body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dMu_3body ) )
-dS_dMu_4body_eqn = dr2.simplify( dr2.eval_phys_vev( dS_dMu_4body ) )
 
 print('Equations obtained')
 
@@ -371,48 +203,6 @@ dT_dMu_2body_eqn_in_dr = Tensor(
     dT_dMu_2body_eqn.terms
 )
 
-dS_dBeta_0body_eqn_in_dr = Tensor(
-    dr,
-    dS_dBeta_0body_eqn.terms
-)
-dS_dBeta_1body_eqn_in_dr = Tensor(
-    dr,
-    dS_dBeta_1body_eqn.terms
-)
-dS_dBeta_2body_eqn_in_dr = Tensor(
-    dr,
-    dS_dBeta_2body_eqn.terms
-)
-dS_dBeta_3body_eqn_in_dr = Tensor(
-    dr,
-    dS_dBeta_3body_eqn.terms
-)
-dS_dBeta_4body_eqn_in_dr = Tensor(
-    dr,
-    dS_dBeta_4body_eqn.terms
-)
-
-dS_dMu_0body_eqn_in_dr = Tensor(
-    dr,
-    dS_dMu_0body_eqn.terms
-)
-dS_dMu_1body_eqn_in_dr = Tensor(
-    dr,
-    dS_dMu_1body_eqn.terms
-)
-dS_dMu_2body_eqn_in_dr = Tensor(
-    dr,
-    dS_dMu_2body_eqn.terms
-)
-dS_dMu_3body_eqn_in_dr = Tensor(
-    dr,
-    dS_dMu_3body_eqn.terms
-)
-dS_dMu_4body_eqn_in_dr = Tensor(
-    dr,
-    dS_dMu_4body_eqn.terms
-)
-
 # Now the actual optimization process
 tbeta0 = Symbol('tb0')
 tbeta1 = IndexedBase('tb1')
@@ -421,45 +211,15 @@ tmu0 = Symbol('tm0')
 tmu1 = IndexedBase('tm1')
 tmu2 = IndexedBase('tm2')
 
-sbeta0 = Symbol('sb0')
-sbeta1 = IndexedBase('sb1')
-sbeta2 = IndexedBase('sb2')
-sbeta3 = IndexedBase('sb3')
-sbeta4 = IndexedBase('sb4')
-smu0 = Symbol('sm0')
-smu1 = IndexedBase('sm1')
-smu2 = IndexedBase('sm2')
-smu3 = IndexedBase('sm3')
-smu4 = IndexedBase('sm4')
-
 work_beta = [
     dr.define(tbeta0, dT_dBeta_0body_eqn_in_dr),
     dr.define(tbeta1[p,q], dT_dBeta_1body_eqn_in_dr),
-    dr.define(tbeta2[p,q,r,s], dT_dBeta_2body_eqn_in_dr),
-    dr.define(sbeta0, dS_dBeta_0body_eqn_in_dr),
-    dr.define(sbeta1[p,q], dS_dBeta_1body_eqn_in_dr),
-    dr.define(sbeta2[p,q,r,s], dS_dBeta_2body_eqn_in_dr),
-    dr.define(sbeta3[p,q,r,a,b,c], dS_dBeta_3body_eqn_in_dr),
-    dr.define(sbeta4[p,q,r,s,a,b,c,d], dS_dBeta_4body_eqn_in_dr)
 ]
 
 work_mu = [
     dr.define(tmu0, dT_dMu_0body_eqn_in_dr),
     dr.define(tmu1[p,q], dT_dMu_1body_eqn_in_dr),
-    dr.define(tmu2[p,q,r,s], dT_dMu_2body_eqn_in_dr),
-    dr.define(smu0, dS_dMu_0body_eqn_in_dr),
-    dr.define(smu1[p,q], dS_dMu_1body_eqn_in_dr),
-    dr.define(smu2[p,q,r,s], dS_dMu_2body_eqn_in_dr),
-    dr.define(smu3[p,q,r,a,b,c], dS_dMu_3body_eqn_in_dr),
-    dr.define(smu4[p,q,r,s,a,b,c,d], dS_dMu_4body_eqn_in_dr)
 ]
-
-# work_eqn = [
-#     dr.define(tbeta1[p,q], dT_dBeta_1body_eqn_in_dr),
-#     dr.define(sbeta1[p,q], dS_dBeta_1body_eqn_in_dr),
-#     dr.define(tmu1[p,q], dT_dMu_1body_eqn_in_dr),
-#     dr.define(smu1[p,q], dS_dMu_1body_eqn_in_dr),
-# ]
 
 #####################################################################
 #       BETA equations - code optimization                          #
@@ -489,13 +249,13 @@ print('Length of eval seq')
 print(len(eval_beta))
 
 # Code Generation
-# fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
-# code = fort_print.doprint(eval_beta, separate_decls=False)
+fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
+code = fort_print.doprint(eval_beta, separate_decls=False)
 
-ein_print = EinsumPrinter()
-code = ein_print.doprint(eval_beta, separate_decls=False)
+# ein_print = EinsumPrinter()
+# code = ein_print.doprint(eval_beta, separate_decls=False)
 
-with open('BetaDerMP2.py','w') as fp:
+with open('BetaDerPT.f90','w') as fp:
     print(code, file=fp)
 
 
@@ -527,48 +287,20 @@ print('Length of eval seq')
 print(len(eval_mu))
 
 # Code Generation
-# fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
-# code = fort_print.doprint(eval_mu, separate_decls=False)
-
-code = ein_print.doprint(eval_mu, separate_decls=False)
-
-with open('MuDerMP2.py','w') as fp:
-    print(code, file=fp)
-
-""""
-# Original Un-optimized cost
-orig_cost = get_flop_cost(work_eqn, leading=True)
-init_printing()
-print('Original cost of equations')
-print(orig_cost)
-
-# Optimizing BETA equation
-eval_seq = optimize(
-    work_eqn,
-    interm_fmt = 'tau{}'
-)
-
-opt_cost = get_flop_cost(eval_seq, leading=True)
-print('Optimized cost of equations')
-print(opt_cost)
-print('Length of eval seq')
-print(len(eval_seq))
-
-# Code Generation
 fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
-code = fort_print.doprint(eval_seq, separate_decls=False)
+code = fort_print.doprint(eval_mu, separate_decls=False)
 
-with open('OpDerMP2.f90','w') as fp:
+# code = ein_print.doprint(eval_mu, separate_decls=False)
+
+with open('MuDerPT.f90','w') as fp:
     print(code, file=fp)
 
-"""
 
 """-------------------------------------------------------------------------"""
 """                        Testing the Stuff Generated                      """
 """-------------------------------------------------------------------------"""
 with dr.report('derivatives.html','Covariant Derivatives') as rep:
     rep.add('Tvec',Tvec)
-    rep.add('Svec',Svec)
     # rep.add('dT1_dBeta',dT1_dBeta)
     # rep.add('dT2_dBeta',dT2_dBeta)
     # rep.add('dS1_dBeta',dS1_dBeta)
@@ -580,21 +312,11 @@ with dr.report('derivatives.html','Covariant Derivatives') as rep:
     # rep.add('dS2_dMu',dS2_dMu)
     # rep.add('dS3_dMu',dS3_dMu)
     rep.add('dT_dBeta',dT_dBeta)
-    rep.add('dS_dBeta',dS_dBeta)
     rep.add('dT_dMu',dT_dMu)
-    rep.add('dS_dMu',dS_dMu)
     rep.add('dT_dBeta_1body',dT_dBeta_1body_eqn_in_dr)
     rep.add('dT_dBeta_2body',dT_dBeta_2body_eqn_in_dr)
-    rep.add('dS_dBeta_1body',dS_dBeta_1body_eqn_in_dr)
-    rep.add('dS_dBeta_2body',dS_dBeta_2body_eqn_in_dr)
-    rep.add('dS_dBeta_3body',dS_dBeta_3body_eqn_in_dr)
-    rep.add('dS_dBeta_4body',dS_dBeta_4body_eqn_in_dr)
     rep.add('dT_dMu_1body',dT_dMu_1body_eqn_in_dr)
     rep.add('dT_dMu_2body',dT_dMu_2body_eqn_in_dr)
-    rep.add('dS_dMu_1body',dS_dMu_1body_eqn_in_dr)
-    rep.add('dS_dMu_2body',dS_dMu_2body_eqn_in_dr)
-    rep.add('dS_dMu_3body',dS_dMu_3body_eqn_in_dr)
-    rep.add('dS_dMu_4body',dS_dMu_4body_eqn_in_dr)
     # i = 0
     # for eq in eval_seq:
     #     rep.add('Intermediate Eqn {}'.format(i),eq)

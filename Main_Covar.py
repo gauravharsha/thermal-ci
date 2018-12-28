@@ -5,9 +5,11 @@ import matplotlib.pyplot as plt
 import h5py, time
 import pdb
 
-from PyPTLib import *
-from CovMuPT2 import *
-from OpDerLib import *
+from CovBetaPT import *
+from CovMuPT import *
+from EnAndOvlp import *
+# from BetaDerPT import *
+# from MuDerPT import *
 
 from IntTran import *
 from EvolveFuncsCovar import *
@@ -156,33 +158,22 @@ def main():
     # elements in the t1 and t2 matrices
     len_t1 = int(nso**2)
     len_t2 = int(comb(nso,2)**2)
-    len_t3 = int(comb(nso,3)**2)
-    len_t4 = int(comb(nso,4)**2)
 
-    t0 = 0.0
-    s0 = 0.0
+    t0 = 1.0
     t1_vec = np.zeros(nso**2)
-    s1_vec = np.zeros(nso**2)
     t2_vec = np.zeros( int( comb(nso,2)**2 ) )
-    s2_vec = np.zeros( int( comb(nso,2)**2 ) )
-    s3_vec = np.zeros( int( comb(nso,3)**2 ) )
-    s4_vec = np.zeros( int( comb(nso,4)**2 ) )
 
     # These are the actual t1 and t2 matrices
     t1 = np.reshape(t1_vec,(nso,nso))
     t2 = T2_Decompress(t2_vec,nso)
-    s1 = np.reshape(s1_vec,(nso,nso))
-    s2 = T2_Decompress(s2_vec,nso)
-    s3 = T3_Decompress(s3_vec,nso)
-    s4 = T4_Decompress(s4_vec,nso)
 
     # Hartree Fock Energy at BETA = 0
-    E_hf = e_nuc + EnergyHF(
-        h1, x, y 
+    E_hf,o_hf = EnAndOvlpHF(
+        h1, t0, x, y 
     )
 
-    e_1, e_2, o_1, o_2, o_3, o_4 = mpenergycov(
-        h1, eri, t0, t1, t2, s0, s1, s2, s3, s4, x, y
+    e_1, e_2, o_1, o_2 = enandovlp(
+        h1, eri, t0, t1, t2, x, y
     )
 
     # Beta Grid
@@ -192,7 +183,7 @@ def main():
 
     # Alpha Grid
     mu_0 = np.log(alpha)
-    mu_step_0 = +1e-2
+    mu_step_0 = +1e-1
     mu_f = mu_step_0
 
     n_data = 1
@@ -204,11 +195,7 @@ def main():
     #################################################################
 
     # initial condition for Tamps at beta = 0 = mu
-    # NOTE: there are two sets of scalars, singles and doubles parameters here,
-    #       one each for the first and second order PT wavefunctions
-    #       The order in which they are stacked is as follows:
-    #               [t1,s1,t2,s2]
-    y0 = np.concatenate(([t0],[s0],t1_vec,s1_vec,t2_vec,s2_vec,s3_vec,s4_vec))
+    y0 = np.concatenate(([t0], t1_vec, t2_vec))
     ystack = np.zeros((n_data,np.size(y0)))
     ystack[0,:] = y0
 
@@ -217,32 +204,23 @@ def main():
     e_mp1 = np.zeros(n_data)
     e_mp2 = np.zeros(n_data)
 
-    ov_mp2 = np.zeros(n_data)
-    ov_mp3 = np.zeros(n_data)
-    ov_mp4 = np.zeros(n_data)
-
     mu_cc = np.zeros(n_data)
 
     n_exp = np.zeros(n_data)
 
-    t0_rms = np.zeros(n_data)
+    t0_rms = np.ones(n_data)
     t1_rms = np.zeros(n_data)
     t2_rms = np.zeros(n_data)
 
-    s0_rms = np.zeros(n_data)
-    s1_rms = np.zeros(n_data)
-    s2_rms = np.zeros(n_data)
-    s3_rms = np.zeros(n_data)
-    s4_rms = np.zeros(n_data)
+    e_hf[0] = e_nuc + E_hf/o_hf
+    e_mp1[0] = e_nuc + (E_hf + e_1)/(o_hf + o_1)
+    e_mp2[0] = e_nuc + (E_hf + e_1 + e_2)/(o_hf + o_1 + o_2)
 
-    e_hf[0] = E_hf
-    e_mp1[0] = (E_hf + e_1)/(1 + o_1)
-    e_mp2[0] = (E_hf + e_1 + e_2)/(1 + o_1 + o_2)
     n_exp[0] = n_elec
 
     print('Thermal Hartree Fock Energy at T = Inf is :',E_hf)
-    print('Thermal MP1 Energy at T = Inf is :',e_1)
-    print('Thermal MP2 Energy at T = Inf is :',e_2)
+    print('Thermal MP1 Corrected Energy at T = Inf is :',e_mp1[0])
+    print('Thermal MP2 Corrected Energy at T = Inf is :',e_mp2[0])
     print('-------------------------------------------------------\n')
 
 
@@ -250,12 +228,13 @@ def main():
     init_time = time.time()
 
     # Print the first things
-    num = EnergyHF(
-        h1*0+1, x, y
+    num_hf, o_hf = EnAndOvlpHF(
+        h1*0+1, t0, x, y
     )
+    num_hf /= o_hf
 
     # Confirm and Print the Number of particles at Beta = 0
-    print('Number of Particles = {}'.format(num))
+    print('Number of Particles = {}'.format(num_hf))
     
     #################################################################
     #                   FILE OUTPUT HANDLE CREATOR                  #
@@ -269,8 +248,7 @@ def main():
 
     fp1 = h5py.File(fout,'w')
 
-    dsets = ['beta','e_hf','e_mp1','e_mp2','chem_pot','t0rms','t1rms','s0rms','s1rms',\
-        't2rms','s2rms','s3rms','s4rms','num']
+    dsets = ['beta','e_hf','e_mp1','e_mp2','chem_pot','t0rms','t1rms','t2rms','num']
 
     # Create all but the ystack data sets
     dset_list = createh5(fp1, dsets, beta_pts)
@@ -283,7 +261,7 @@ def main():
 
     vals = [
         0, e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1], t0_rms[-1], t1_rms[-1],\
-        s0_rms[-1], s1_rms[-1], t2_rms[-1], s2_rms[-1], s3_rms[-1], s4_rms[-1], n_exp[-1], ystack[-1]
+        t2_rms[-1], n_exp[-1], ystack[-1]
     ]
 
     updateh5(dset_list, vals, 0)
@@ -318,15 +296,15 @@ def main():
         y = np.exp( ( -b_span[0]*h1 )/2 )*x*np.sqrt(alpha)
 
         # Check the number of particles before evolution
-        num_hf = EnergyHF(
-            h1*0+1, x, y
+        num_hf, o_hf = EnAndOvlpHF(
+            h1*0+1, t0, x, y
         )
 
-        n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
-            h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
+        n_1, n_2, o_1, o_2 = enandovlp(
+            h1*0+1, eri*0, t0, t1, t2, x, y
         )
 
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+        num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
         print('\t\t\tNumber of particles before evolution = {}'.format(num))
 
         ############################### 
@@ -340,25 +318,20 @@ def main():
 
         # Extract the values
         t0 = yf[0]
-        s0 = yf[1]
-        t1 = np.reshape(yf[2:2+len_t1],(nso,nso))
-        s1 = np.reshape(yf[2+len_t1:2+2*len_t1],(nso,nso))
-        t2 = T2_Decompress(yf[2+2*len_t1:2+2*len_t1+len_t2],nso)
-        s2 = T2_Decompress(yf[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
-        s3 = T3_Decompress(yf[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
-        s4 = T4_Decompress(yf[2+2*(len_t1+len_t2)+len_t3:],nso)
+        t1 = np.reshape(yf[1:1+len_t1],(nso,nso))
+        t2 = T2_Decompress(yf[1+len_t1:],nso)
 
         # Check number after beta evolution
         x = 1/np.sqrt(1 + np.exp( -b_span[1]*h1 )*alpha )
         y = np.exp( ( -b_span[1]*h1 )/2 )*x*np.sqrt(alpha)
         
-        num_hf = EnergyHF(
-            h1*0+1, x, y
+        num_hf, o_hf = EnAndOvlpHF(
+            h1*0+1, t0, x, y
         )
-        n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
-            h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
+        n_1, n_2, o_1, o_2 = enandovlp(
+            h1*0+1, eri*0, t0, t1, t2, x, y
         )
-        num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+        num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
 
         print('\n\t\t\tNew Beta = {}'.format(beta_2))
         print('\t\t\tNumber of particles after evolution = {}'.format(num))
@@ -413,22 +386,17 @@ def main():
 
                 # Extract the amplitudes
                 t0 = yf2[0]
-                s0 = yf2[1]
-                t1 = np.reshape(yf2[2:2+len_t1],(nso,nso))
-                s1 = np.reshape(yf2[2+len_t1:2+2*len_t1],(nso,nso))
-                t2 = T2_Decompress(yf2[2+2*len_t1:2+2*len_t1+len_t2],nso)
-                s2 = T2_Decompress(yf2[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
-                s3 = T3_Decompress(yf2[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
-                s4 = T4_Decompress(yf2[2+2*(len_t1+len_t2)+len_t3:],nso)
+                t1 = np.reshape(yf2[1:1+len_t1],(nso,nso))
+                t2 = T2_Decompress(yf2[1+len_t1:],nso)
 
                 # Evaluate the Number Expectation
-                num_hf = EnergyHF(
-                    h1*0+1, x, y
+                num_hf, o_hf = EnAndOvlpHF(
+                    h1*0+1, t0, x, y
                 )
-                n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
-                    h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
+                n_1, n_2, o_1, o_2 = enandovlp(
+                    h1*0+1, eri*0, t0, t1, t2, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+                num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
 
                 # Finer grid if we are closer to n_elec
                 val = np.abs(num - n_elec) - ndiff_mag
@@ -481,22 +449,17 @@ def main():
 
                 # Extract the amplitudes
                 t0 = yf_mid[0]
-                s0 = yf_mid[1]
-                t1 = np.reshape(yf_mid[2:2+len_t1],(nso,nso))
-                s1 = np.reshape(yf_mid[2+len_t1:2+2*len_t1],(nso,nso))
-                t2 = T2_Decompress(yf_mid[2+2*len_t1:2+2*len_t1+len_t2],nso)
-                s2 = T2_Decompress(yf_mid[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
-                s3 = T3_Decompress(yf_mid[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
-                s4 = T4_Decompress(yf_mid[2+2*(len_t1+len_t2)+len_t3:],nso)
+                t1 = np.reshape(yf_mid[1:1+len_t1],(nso,nso))
+                t2 = T2_Decompress(yf_mid[1+len_t1:],nso)
 
                 # Compute the number and update the bracket
-                num_hf = EnergyHF(
-                    h1*0+1, x, y
+                num_hf, o_hf = EnAndOvlpHF(
+                    h1*0+1, t0, x, y
                 )
-                n_1, n_2, o_1, o_2, o_3, o_4 = mpenergycov(
-                    h1*0+1, eri*0, t0, t1, t2, s0, s1, s2, s3, s4, x, y
+                n_1, n_2, o_1, o_2 = enandovlp(
+                    h1*0+1, eri*0, t0, t1, t2, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(1 + o_1 + o_2)
+                num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
 
 
                 if np.sign( num - n_elec ) == ndiff_sgn1:
@@ -516,13 +479,8 @@ def main():
 
 
         t0 = yf[0]
-        s0 = yf[1]
-        t1 = np.reshape(yf[2:2+len_t1],(nso,nso))
-        s1 = np.reshape(yf[2+len_t1:2+2*len_t1],(nso,nso))
-        t2 = T2_Decompress(yf[2+2*len_t1:2+2*len_t1+len_t2],nso)
-        s2 = T2_Decompress(yf[2+2*len_t1+len_t2:2+2*(len_t1+len_t2)],nso)
-        s3 = T3_Decompress(yf[2+2*(len_t1+len_t2):2+2*(len_t1+len_t2)+len_t3],nso)
-        s4 = T4_Decompress(yf[2+2*(len_t1+len_t2)+len_t3:],nso)
+        t1 = np.reshape(yf[1:1+len_t1],(nso,nso))
+        t2 = T2_Decompress(yf[1+len_t1:],nso)
 
         # Setting up for next loop
         mu_0 = mu_f
@@ -532,13 +490,16 @@ def main():
         # Computing the quantities of interest
         beta_grid = np.append(beta_grid,beta_2)
 
+        E_hf, o_hf = EnAndOvlpHF(
+            h1, t0, x, y
+        )
         e_hf = np.append(
             e_hf,
-            e_nuc + EnergyHF(h1, x, y)
+            e_nuc + E_hf/o_hf
         )
 
-        e_1, e_2, o_1, o_2, o_3, o_4 = mpenergycov(
-            h1, eri, t0, t1, t2, s0, s1, s2, s3, s4, x, y
+        e_1, e_2, o_1, o_2 = enandovlp(
+            h1, eri, t0, t1, t2, x, y
         )
 
         # XXX: Checkpoint
@@ -548,25 +509,16 @@ def main():
         # print('overlap correction at order 4: {}'.format(o_4))
         # pdb.set_trace()
 
-        e_mp1 = np.append(e_mp1, ( e_hf[-1] + e_1 ) / (1+o_2) )
-        e_mp2 = np.append(e_mp2, ( e_hf[-1] + e_1 + e_2 ) / (1+o_2+o_3) )
-
-        # ov_mp1 = np.append(ov_mp1, o_1)
-        ov_mp2 = np.append(ov_mp2, o_2)
-        ov_mp3 = np.append(ov_mp3, o_3)
-        ov_mp4 = np.append(ov_mp4, o_4)
-        print('The value of the <0|1> = {}'.format(o_1))
+        e_mp1 = np.append(e_mp1, e_nuc + ( E_hf + e_1 ) / (o_hf + o_1) )
+        e_mp2 = np.append(e_mp2, e_nuc + ( E_hf + e_1 + e_2 ) / (o_hf + o_1 + o_2) )
 
         mu_cc = np.append(mu_cc,mu_f)
 
         n_exp = np.append(n_exp,num)
+
         t0_rms = np.append(
             t0_rms,
             t0
-        )
-        s0_rms = np.append(
-            s0_rms,
-            s0
         )
         t1_rms = np.append(
             t1_rms,
@@ -576,26 +528,10 @@ def main():
             t2_rms,
             np.sqrt(np.mean(t2**2))
         )
-        s1_rms = np.append(
-            s1_rms,
-            np.sqrt(np.mean(s1**2))
-        )
-        s2_rms = np.append(
-            s2_rms,
-            np.sqrt(np.mean(s2**2))
-        )
-        s3_rms = np.append(
-            s3_rms,
-            np.sqrt(np.mean(s3**2))
-        )
-        s4_rms = np.append(
-            s4_rms,
-            np.sqrt(np.mean(s4**2))
-        )
 
         vals = [
             beta_grid[-1], e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1],t0_rms[-1],t1_rms[-1],\
-            s0_rms[-1],s1_rms[-1], t2_rms[-1], s2_rms[-1], s3_rms[-1], s4_rms[-1], n_exp[-1], ystack[-1]
+            t2_rms[-1], n_exp[-1], ystack[-1]
         ]
 
         updateh5(dset_list, vals, j)

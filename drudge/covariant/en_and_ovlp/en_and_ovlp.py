@@ -1,11 +1,11 @@
 """
     Date: Dec 4, 2018
-    Modified: Dec 24, 2018
+    Modified: Dec 25, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
     This is covariant version - i.e. the reference keeps evolving
-    Location: Documents/projects/Molecules/thermal_covariant/drudge/ccd/
 
-    Here, we are only exporting the energy and the overlap
+    Here, we expand the wavefunction as a CI-like series expansion and 
+    then form the energy and overlaps
 """
 
 # from pyspark import SparkContext
@@ -129,37 +129,9 @@ t0 = Symbol('t0')
 t1 = IndexedBase('t1')
 t2 = IndexedBase('t2')
 
-# Second order perturbation wavefunction description
-s0 = Symbol('s0')
-s1 = IndexedBase('s1')
-s2 = IndexedBase('s2')
-s3 = IndexedBase('s3')
-s4 = IndexedBase('s4')
-
 dr2.set_symm(t2,
     Perm([1,0,2,3],NEG),
     Perm([0,1,3,2],NEG),
-)
-
-dr2.set_symm(s2,
-    Perm([1,0,2,3],NEG),
-    Perm([0,1,3,2],NEG),
-)
-
-dr2.set_symm(s3,
-    Perm([1,0,2,3,4,5],NEG),
-    Perm([0,2,1,3,4,5],NEG),
-    Perm([0,1,2,4,3,5],NEG),
-    Perm([0,1,2,3,5,4],NEG),
-)
-
-dr2.set_symm(s4,
-    Perm([1,0,2,3,4,5,6,7],NEG),
-    Perm([0,2,1,3,4,5,6,7],NEG),
-    Perm([0,1,3,2,4,5,6,7],NEG),
-    Perm([0,1,2,3,5,4,6,7],NEG),
-    Perm([0,1,2,3,4,6,5,7],NEG),
-    Perm([0,1,2,3,4,5,7,6],NEG),
 )
 
 T1 = dr2.einst(
@@ -171,25 +143,6 @@ T2 = dr2.einst(
         * c_dag[c,DOWN]) / 4 
 )
 
-S1 = dr2.einst(
-    s1[a, i] * ( (c_dag[a,UP] * c_dag[i,DOWN]) )
-)
-
-S2 = dr2.einst(
-    s2[a, b, i, j] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[j,DOWN] \
-        * c_dag[i,DOWN]) / 4 
-)
-
-S3 = dr2.einst(
-    s3[a, b, c, i, j, k] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] \
-        * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 36
-)
-
-S4 = dr2.einst(
-    s4[a, b, c, d, i, j, k, l] * (c_dag[a,UP] * c_dag[b,UP] * c_dag[c,UP] * c_dag[d,UP] \
-        * c_dag[l,DOWN] * c_dag[k,DOWN] * c_dag[j,DOWN] * c_dag[i,DOWN]) / 576
-)
-
 T1dag = dr2.einst(
     t1[a,b] * (c_[b,DOWN] * c_[a,UP] )
 )
@@ -198,30 +151,8 @@ T2dag = dr2.einst(
     t2[a,b,c,d] * ( c_[c,DOWN] * c_[d,DOWN] * c_[b,UP] * c_[a,UP] ) / 4
 )
 
-S1dag = dr2.einst(
-    s1[a, i] * ( (c_[i,DOWN] * c_[a,UP]) )
-)
-
-S2dag = dr2.einst(
-    s2[a, b, i, j] * (c_[i,DOWN] * c_[j,DOWN] \
-        * c_[b,UP] * c_[a,UP]) / 4 
-)
-
-S3dag = dr2.einst(
-    s3[a, b, c, i, j, k] * ( c_[i,DOWN] * c_[j,DOWN] * c_[k,DOWN]\
-        * c_[c,UP] * c_[b,UP] * c_[a,UP]) / 36
-)
-
-S4dag = dr2.einst(
-    s4[a, b, c, d, i, j, k, l] * (c_[i,DOWN] * c_[j,DOWN] * c_[k,DOWN] * c_[l,DOWN] \
-        * c_[d,UP] * c_[c,UP] * c_[b,UP] * c_[a,UP]) / 576
-)
-
 Tvec = dr2.simplify(t0 + T1 + T2)
 Tdagvec = dr2.simplify(t0 + T1dag + T2dag)
-
-Svec = dr2.simplify(s0 + S1 + S2 + S3 + S4)
-Sdagvec = dr2.simplify(s0 + S1dag + S2dag + S3dag + S4dag)
 
 
 """-------------------------------------------------------------------------"""
@@ -229,35 +160,24 @@ Sdagvec = dr2.simplify(s0 + S1dag + S2dag + S3dag + S4dag)
 """-------------------------------------------------------------------------"""
 
 # Overlap Operators
-mp2_ovlp_op = dr2.memoize(lambda: dr2.simplify( Tdagvec * Tvec ), 'mp2_ovlp_order.pickle')
-mp3_ovlp_op = dr2.memoize(lambda: dr2.simplify( Tdagvec * Svec + Sdagvec * Tvec), 'mp3_ovlp_order.pickle')
-mp4_ovlp_op = dr2.memoize(lambda: dr2.simplify( Sdagvec * Svec ), 'mp4_ovlp_order.pickle')
+ovlp_op = dr2.memoize(lambda: dr2.simplify( Tdagvec * Tvec ), 'ovlp_op.pickle')
 
 # Energy Operators (NOTE that this is just the numerator of the energy)
-mp1_enum_op = dr2.memoize(
+enum_op = dr2.memoize(
     lambda: dr2.simplify(
-        Tdagvec*ham_th1 + ham_th1*Tvec + ham_th2
+        (Tdagvec * ham_th * Tvec)
     ),
-    'mp1_enum_op.pickle'
-)
-mp2_enum_op = dr2.memoize(
-    lambda: dr2.simplify(
-        Tdagvec*ham_th1*Tvec + Sdagvec*ham_th1 + ham_th1*Svec + ham_th2*Tvec + Tdagvec*ham_th2
-    ),
-    'mp2_enum_op.pickle'
+    'enum_op.pickle'
 )
 
 # Hbar Computing Time
 hbar_time = time.time()
 
 # Now, Overlap expectation values
-mp2_ovlp = dr2.memoize( lambda: dr2.simplify( dr2.simplify( dr2.eval_phys_vev( dr2.simplify( mp2_ovlp_op ))) ), 'mp2_ovlp_eqn.pickle')
-mp3_ovlp = dr2.memoize( lambda: dr2.simplify( dr2.simplify( dr2.eval_phys_vev( dr2.simplify( mp3_ovlp_op ))) ), 'mp3_ovlp_eqn.pickle')
-mp4_ovlp = dr2.memoize( lambda: dr2.simplify( dr2.simplify( dr2.eval_phys_vev( dr2.simplify( mp4_ovlp_op ))) ), 'mp4_ovlp_eqn.pickle')
+ovlp_eqn = dr2.memoize( lambda: dr2.simplify( dr2.simplify( dr2.eval_phys_vev( dr2.simplify( ovlp_op ))) ), 'ovlp_eqn.pickle')
 
 # and Energy-numerator expectation values
-mp1_enum = dr2.memoize( lambda: dr2.simplify( dr2.simplify( dr2.eval_phys_vev( dr2.simplify( mp1_enum_op ))) ), 'mp1_enum_eqn.pickle')
-mp2_enum = dr2.memoize( lambda: dr2.simplify( dr2.simplify( dr2.eval_phys_vev( dr2.simplify( mp2_enum_op ))) ), 'mp2_enum_eqn.pickle')
+enum_eqn = dr2.memoize( lambda: dr2.simplify( dr2.simplify( dr2.eval_phys_vev( dr2.simplify( enum_op ))) ), 'enum_eqn.pickle')
 
 print('Equations obtained')
 
@@ -274,34 +194,19 @@ t2eqn_time = time.time()
 ###############################################################################
 
 
-mp2_ovlp_in_dr = Tensor(
+ovlp_in_dr = Tensor(
     dr,
-    mp2_ovlp.terms
+    ovlp_eqn.terms
 )
-mp3_ovlp_in_dr = Tensor(
+enum_in_dr = Tensor(
     dr,
-    mp3_ovlp.terms
-)
-mp4_ovlp_in_dr = Tensor(
-    dr,
-    mp4_ovlp.terms
-)
-mp1_enum_in_dr = Tensor(
-    dr,
-    mp1_enum.terms
-)
-mp2_enum_in_dr = Tensor(
-    dr,
-    mp2_enum.terms
+    enum_eqn.terms
 )
 
 # Now the actual optimization process
 work_eqn = [
-    dr.define(Symbol('e1'), mp1_enum_in_dr),
-    dr.define(Symbol('e2'), mp2_enum_in_dr),
-    dr.define(Symbol('ov2'), mp2_ovlp_in_dr),
-    dr.define(Symbol('ov3'), mp3_ovlp_in_dr),
-    dr.define(Symbol('ov4'), mp4_ovlp_in_dr),
+    dr.define(Symbol('e'), enum_in_dr),
+    dr.define(Symbol('ov'), ovlp_in_dr),
 ]
 
 # Original Un-optimized cost
@@ -324,15 +229,13 @@ opt_cost = get_flop_cost(eval_seq, leading=True)
 print(opt_cost)
 
 # Code Generation
-# fort_print = C99CodePrinter(default_type='Real (Kind=8)', explicit_bounds=True)
-# code = fort_print.doprint(eval_seq, separate_decls=False)
-# c_print = C99CodePrinter()
-# pdb.set_trace()
+fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
+code = fort_print.doprint(eval_seq, separate_decls=False)
 
-ein_print = EinsumPrinter()
-code = ein_print.doprint(eval_seq, separate_decls=False)
-
-with open('ovlp.py','w') as fp:
+# ein_print = EinsumPrinter()
+# code = ein_print.doprint(eval_seq, separate_decls=False)
+ 
+with open('EnAndOvlp.f90','w') as fp:
     print(code, file=fp)
 
 
@@ -344,13 +247,9 @@ with dr.report('en_and_ovlp_cov_pt.html','Thermal Perturbation Theory') as rep:
     rep.add('Full Hamiltonian',full_ham)
     rep.add('Thermal Ham',ham_th)
     rep.add('Tvec',Tvec)
-    rep.add('Svec',Svec)
     rep.add('The Spin Rep for Tilde and non Tilde',c_[a,UP] + c_[b,DOWN])
-    rep.add('Ovlp at order 2',mp2_ovlp_in_dr)
-    rep.add('Ovlp at order 3',mp3_ovlp_in_dr)
-    rep.add('Ovlp at order 4',mp4_ovlp_in_dr)
-    rep.add('MP1 Energy',mp1_enum_in_dr)
-    rep.add('MP2 Energy',mp2_enum_in_dr)
+    rep.add('Ovlp',ovlp_in_dr)
+    rep.add('Energy',enum_in_dr)
     i = 0
     for eq in eval_seq:
         rep.add('Intermediate Eqn {}'.format(i),eq)

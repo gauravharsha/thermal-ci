@@ -29,13 +29,6 @@ t0 = f1['t0rms'][:blen]
 t1_rms = f1['t1rms'][:blen]
 t2_rms = f1['t2rms'][:blen]
 
-s0 = f1['s0rms'][:blen]
-s1_rms = f1['s1rms'][:blen]
-s2_rms = f1['s2rms'][:blen]
-s3_rms = f1['s3rms'][:blen]
-s4_rms = f1['s4rms'][:blen]
-
-
 f1.close()
 
 
@@ -60,42 +53,29 @@ plt.close()
 
 plt.figure()
 plt.plot(beta,t0,label='t0')
-plt.plot(beta,s0,label='s0')
 plt.legend()
 plt.xlabel(r'$\beta$')
-plt.ylabel('RMS t0 and s0')
+plt.ylabel('RMS t0')
 plt.xlim(beta[0],beta[-1])
-plt.savefig(fout+'ts0_amp.pdf')
+plt.savefig(fout+'t0_amp.pdf')
 plt.close()
 
 plt.figure()
 plt.plot(beta,t1_rms,label='RMS t1')
-plt.plot(beta,s1_rms,label='RMS s1')
 plt.legend()
 plt.xlabel(r'$\beta$')
-plt.ylabel('RMS t1 and s1')
+plt.ylabel('RMS t1')
 plt.xlim(beta[0],beta[-1])
 plt.savefig(fout+'t1_amp.pdf')
 plt.close()
 
 plt.figure()
 plt.plot(beta,t2_rms,label='RMS t2')
-plt.plot(beta,s2_rms,label='RMS s2')
 plt.legend()
 plt.xlabel(r'$\beta$')
-plt.ylabel('RMS t2 and s2')
+plt.ylabel('RMS t2')
 plt.xlim(beta[0],beta[-1])
 plt.savefig(fout+'t2_amp.pdf')
-plt.close()
-
-plt.figure()
-plt.plot(beta,s3_rms,label='RMS s3')
-plt.plot(beta,s4_rms,label='RMS s4')
-plt.legend()
-plt.xlabel(r'$\beta$')
-plt.ylabel('RMS s3 and s4')
-plt.xlim(beta[0],beta[-1])
-plt.savefig(fout+'s34_amp.pdf')
 plt.close()
 
 plt.figure()
