@@ -413,9 +413,10 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     #####################################################
     # First two arguments are beta, mu -- here we do not want any effect of either
     t0der, t1der = betaderpt(OneH, 0, T1, T2, U, V)
+    # pdb.set_trace()
 
-    dt0_dtau -= t0der
-    dt1_dtau -= t1der
+    # dt0_dtau -= t0der
+    # dt1_dtau -= t1der
 
     # Reshape the array as vectors and compress to send them out.
     dt1_dtau = np.reshape(dt1_dtau,(Nso)**2)

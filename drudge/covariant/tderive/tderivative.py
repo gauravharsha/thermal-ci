@@ -1,14 +1,14 @@
 """
     Date: Dec 4, 2018
-    Modified: Dec 25, 2018
+    Modified: Dec 27, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
     This is covariant version - i.e. the reference keeps evolving
 
     Here, we compute the derivatives of the operator parts of the cluster operator
 """
 
-from pyspark import SparkContext
-# from dummy_spark import SparkContext
+# from pyspark import SparkContext
+from dummy_spark import SparkContext
 from drudge import *
 from ThermofieldDrudge import *
 from sympy import Symbol, symbols, IndexedBase, sqrt, init_printing, KroneckerDelta
@@ -313,8 +313,10 @@ with dr.report('derivatives.html','Covariant Derivatives') as rep:
     # rep.add('dS3_dMu',dS3_dMu)
     rep.add('dT_dBeta',dT_dBeta)
     rep.add('dT_dMu',dT_dMu)
+    rep.add('dT_dBeta_0body',dT_dBeta_0body_eqn_in_dr)
     rep.add('dT_dBeta_1body',dT_dBeta_1body_eqn_in_dr)
     rep.add('dT_dBeta_2body',dT_dBeta_2body_eqn_in_dr)
+    rep.add('dT_dMu_0body',dT_dMu_0body_eqn_in_dr)
     rep.add('dT_dMu_1body',dT_dMu_1body_eqn_in_dr)
     rep.add('dT_dMu_2body',dT_dMu_2body_eqn_in_dr)
     # i = 0

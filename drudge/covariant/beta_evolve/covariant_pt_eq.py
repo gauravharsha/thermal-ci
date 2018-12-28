@@ -46,14 +46,14 @@ c_dag = nam2.c_dag
 a, b, c, d, i, j, k, l, p, q, r, s = nam2.a, nam2.b, nam2.c, nam2.d, nam2.i, nam2.j, nam2.k, nam2.l, nam2.p, nam2.q, nam2.r, nam2.s
 
 # Full Hamiltonian
-full_ham = dr.simplify(dr.ham)
+full_ham1 = dr.simplify(dr.ham)
 
 e0 = IndexedBase('e0')
 ham1 = dr.einst(
     e0[p]*d_dag[p]*d_[p]
 )
 
-ham2 = full_ham.filter(lambda x: len(x.vecs)>2)
+ham2 = full_ham1.filter(lambda x: len(x.vecs)>2)
 
 full_ham = dr.simplify(ham1 + ham2)
 
@@ -147,14 +147,10 @@ Tvec = dr2.simplify(t0 + T1 + T2)
 
 #########################################################################
 ##      Perturbation Theory equation looks like                        ##
-##      ( d/dBeta + 0.5 H0 ) | 1 > = - 0.5* V |0>                      ##
-##      ( d/dBeta + 0.5 H0 ) | 2 > = - 0.5* V |1>                      ##
-##                                                                     ##
-##      So here, we will generate the RHS components                   ##
 #########################################################################
 
 # First order theory
-mp_rhs_op_mf = dr2.simplify( (Tvec | ham_th1) )
+mp_rhs_op_mf = dr2.simplify( (Tvec * ham_th1 - ham_th1 * Tvec) )
 mp_rhs_op_pot = dr2.simplify( ham_th2 * Tvec )
 mp_rhs_op = dr2.simplify(( mp_rhs_op_mf - mp_rhs_op_pot ) / 2)
 

@@ -1,8 +1,8 @@
-      Subroutine BetaDerPT(E0,T1,T2,NA,X,Y,TB0,TB1)
+      Subroutine BetaDerPT(E0,Mu,T1,T2,NA,X,Y,TB0,TB1)
           Implicit None
           Integer, Intent(In) :: NA
           Real (Kind=8), Intent(In) :: X(NA), Y(NA)
-          Real (Kind=8), Intent(In) :: E0(NA)
+          Real (Kind=8), Intent(In) :: E0(NA), Mu
           Real (Kind=8), Intent(In) :: T1(NA,NA), T2(NA,NA,NA,NA)
           Real (Kind=8), Intent(Out) :: TB0
           Real (Kind=8), Intent(Out) :: TB1(NA,NA)

@@ -21,7 +21,6 @@ beta = np.trim_zeros(f1['beta'][:],'b')
 blen = len(beta)
 
 e_hf = f1['e_hf'][:blen]
-e_mp1 = f1['e_mp1'][:blen]
 e_mp2 = f1['e_mp2'][:blen]
 chem_pot = f1['chem_pot'][:blen]
 
@@ -41,7 +40,6 @@ fout = fname[0:-7]+'_'
 plt.figure()
 # pdb.set_trace()
 plt.plot(beta,e_hf,label='HF')
-plt.plot(beta,e_mp1,label='MP1')
 plt.plot(beta,e_mp2,label='MP2')
 plt.legend()
 plt.xlabel(r'$\beta$')

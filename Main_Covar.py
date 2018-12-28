@@ -168,12 +168,8 @@ def main():
     t2 = T2_Decompress(t2_vec,nso)
 
     # Hartree Fock Energy at BETA = 0
-    E_hf,o_hf = EnAndOvlpHF(
-        h1, t0, x, y 
-    )
-
-    e_1, e_2, o_1, o_2 = enandovlp(
-        h1, eri, t0, t1, t2, x, y
+    E_hf, o_hf = enandovlp(
+        h1, eri, t0, t1, t2, x, y 
     )
 
     # Beta Grid
@@ -201,7 +197,6 @@ def main():
 
     # Data to be output at BETA GRID POINT
     e_hf = np.zeros(n_data)
-    e_mp1 = np.zeros(n_data)
     e_mp2 = np.zeros(n_data)
 
     mu_cc = np.zeros(n_data)
@@ -213,13 +208,11 @@ def main():
     t2_rms = np.zeros(n_data)
 
     e_hf[0] = e_nuc + E_hf/o_hf
-    e_mp1[0] = e_nuc + (E_hf + e_1)/(o_hf + o_1)
-    e_mp2[0] = e_nuc + (E_hf + e_1 + e_2)/(o_hf + o_1 + o_2)
+    e_mp2[0] = e_hf[0]
 
     n_exp[0] = n_elec
 
     print('Thermal Hartree Fock Energy at T = Inf is :',E_hf)
-    print('Thermal MP1 Corrected Energy at T = Inf is :',e_mp1[0])
     print('Thermal MP2 Corrected Energy at T = Inf is :',e_mp2[0])
     print('-------------------------------------------------------\n')
 
@@ -228,8 +221,8 @@ def main():
     init_time = time.time()
 
     # Print the first things
-    num_hf, o_hf = EnAndOvlpHF(
-        h1*0+1, t0, x, y
+    num_hf, o_hf = enandovlp(
+        h1*0+1, eri*0, t0, t1, t2, x, y
     )
     num_hf /= o_hf
 
@@ -248,7 +241,7 @@ def main():
 
     fp1 = h5py.File(fout,'w')
 
-    dsets = ['beta','e_hf','e_mp1','e_mp2','chem_pot','t0rms','t1rms','t2rms','num']
+    dsets = ['beta','e_hf','e_mp2','chem_pot','t0rms','t1rms','t2rms','num']
 
     # Create all but the ystack data sets
     dset_list = createh5(fp1, dsets, beta_pts)
@@ -260,7 +253,7 @@ def main():
     # pdb.set_trace()
 
     vals = [
-        0, e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1], t0_rms[-1], t1_rms[-1],\
+        0, e_hf[-1], e_mp2[-1], mu_cc[-1], t0_rms[-1], t1_rms[-1],\
         t2_rms[-1], n_exp[-1], ystack[-1]
     ]
 
@@ -296,15 +289,11 @@ def main():
         y = np.exp( ( -b_span[0]*h1 )/2 )*x*np.sqrt(alpha)
 
         # Check the number of particles before evolution
-        num_hf, o_hf = EnAndOvlpHF(
-            h1*0+1, t0, x, y
-        )
-
-        n_1, n_2, o_1, o_2 = enandovlp(
+        num, ov = enandovlp(
             h1*0+1, eri*0, t0, t1, t2, x, y
         )
 
-        num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
+        num /= ov
         print('\t\t\tNumber of particles before evolution = {}'.format(num))
 
         ############################### 
@@ -325,13 +314,11 @@ def main():
         x = 1/np.sqrt(1 + np.exp( -b_span[1]*h1 )*alpha )
         y = np.exp( ( -b_span[1]*h1 )/2 )*x*np.sqrt(alpha)
         
-        num_hf, o_hf = EnAndOvlpHF(
-            h1*0+1, t0, x, y
-        )
-        n_1, n_2, o_1, o_2 = enandovlp(
+        num, ov = enandovlp(
             h1*0+1, eri*0, t0, t1, t2, x, y
         )
-        num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
+
+        num /= ov
 
         print('\n\t\t\tNew Beta = {}'.format(beta_2))
         print('\t\t\tNumber of particles after evolution = {}'.format(num))
@@ -372,6 +359,7 @@ def main():
                 if count > 1000:
                     print('Could not find the bracket after 6000 steps')
                     count = 0
+                    pdb.set_trace()
                     exit()
                     break
 
@@ -390,13 +378,11 @@ def main():
                 t2 = T2_Decompress(yf2[1+len_t1:],nso)
 
                 # Evaluate the Number Expectation
-                num_hf, o_hf = EnAndOvlpHF(
-                    h1*0+1, t0, x, y
-                )
-                n_1, n_2, o_1, o_2 = enandovlp(
+                num, ov = enandovlp(
                     h1*0+1, eri*0, t0, t1, t2, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
+
+                num /= ov
 
                 # Finer grid if we are closer to n_elec
                 val = np.abs(num - n_elec) - ndiff_mag
@@ -453,13 +439,11 @@ def main():
                 t2 = T2_Decompress(yf_mid[1+len_t1:],nso)
 
                 # Compute the number and update the bracket
-                num_hf, o_hf = EnAndOvlpHF(
-                    h1*0+1, t0, x, y
-                )
-                n_1, n_2, o_1, o_2 = enandovlp(
+                num, ov = enandovlp(
                     h1*0+1, eri*0, t0, t1, t2, x, y
                 )
-                num = (num_hf + n_1 + n_2)/(o_hf + o_1 + o_2)
+
+                num /= ov
 
 
                 if np.sign( num - n_elec ) == ndiff_sgn1:
@@ -490,15 +474,15 @@ def main():
         # Computing the quantities of interest
         beta_grid = np.append(beta_grid,beta_2)
 
-        E_hf, o_hf = EnAndOvlpHF(
-            h1, t0, x, y
+        E_hf, o_hf = enandovlp(
+            h1, eri, t0, t1*0, t2*0, x, y
         )
         e_hf = np.append(
             e_hf,
             e_nuc + E_hf/o_hf
         )
 
-        e_1, e_2, o_1, o_2 = enandovlp(
+        e_2, o_2 = enandovlp(
             h1, eri, t0, t1, t2, x, y
         )
 
@@ -509,8 +493,7 @@ def main():
         # print('overlap correction at order 4: {}'.format(o_4))
         # pdb.set_trace()
 
-        e_mp1 = np.append(e_mp1, e_nuc + ( E_hf + e_1 ) / (o_hf + o_1) )
-        e_mp2 = np.append(e_mp2, e_nuc + ( E_hf + e_1 + e_2 ) / (o_hf + o_1 + o_2) )
+        e_mp2 = np.append(e_mp2, e_2/o_2 )
 
         mu_cc = np.append(mu_cc,mu_f)
 
@@ -530,7 +513,7 @@ def main():
         )
 
         vals = [
-            beta_grid[-1], e_hf[-1], e_mp1[-1], e_mp2[-1], mu_cc[-1],t0_rms[-1],t1_rms[-1],\
+            beta_grid[-1], e_hf[-1], e_mp2[-1], mu_cc[-1],t0_rms[-1],t1_rms[-1],\
             t2_rms[-1], n_exp[-1], ystack[-1]
         ]
 

@@ -1,6 +1,6 @@
 """
     Date: Dec 2, 2018
-    Modified: Dec 25, 2018
+    Modified: Dec 27, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
     This is covariant version - i.e. the reference keeps evolving
 
@@ -8,8 +8,8 @@
     then form the working equations (following Griffiths)
 """
 
-from pyspark import SparkContext
-# from dummy_spark import SparkContext
+# from pyspark import SparkContext
+from dummy_spark import SparkContext
 from drudge import *
 from ThermofieldDrudge import *
 # from sympy import Symbol, symbols, IndexedBase, sqrt, init_printing, KroneckerDelta
@@ -45,8 +45,6 @@ c_dag = nam2.c_dag
 a, b, c, d, i, j, k, l, p, q, r, s = nam2.a, nam2.b, nam2.c, nam2.d, nam2.i, nam2.j, nam2.k, nam2.l, nam2.p, nam2.q, nam2.r, nam2.s
 
 # Full Hamiltonian
-full_ham = dr.simplify(dr.ham)
-
 ham1 = dr.einst(
     d_dag[p]*d_[p]
 )

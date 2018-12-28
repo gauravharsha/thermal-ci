@@ -40,175 +40,123 @@
             <div class="page-header" id="sect-1">
                 <h2>Full Hamiltonian</h2>
             </div>
-            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} u_{a,b,c,d}    d^{\dagger}_{a} d^{\dagger}_{b} d^{}_{d} d^{}_{c}  + \sum_{a \in L} e^{(0)}_{a}    d^{\dagger}_{a} d^{}_{a} \]</p>
+            <p>\[ \sum_{a \in L} e^{(0)}_{a}    d^{\dagger}_{a} d^{}_{a}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} u_{a,b,c,d}    d^{\dagger}_{a} d^{\dagger}_{b} d^{}_{d} d^{}_{c} \]</p>
             <div class="page-header" id="sect-2">
                 <h2>Thermal Ham</h2>
             </div>
-            <p>\[ - \sum_{a \in L} y_{a}^{2}  e^{(0)}_{a}    c^{\dagger}_{a, \downarrow} c^{}_{a, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  y_{a}  y_{b}  u_{b,c,a,c}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow}  + \sum_{a \in L} x_{a}^{2}  e^{(0)}_{a}    c^{\dagger}_{a, \uparrow} c^{}_{a, \uparrow}  + \sum_{a \in L} e^{(0)}_{a}  x_{a}  y_{a}    c^{}_{a, \downarrow} c^{}_{a, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} x_{a}  x_{b}  x_{c}  x_{d}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{}_{d, \uparrow} c^{}_{c, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} x_{a}  y_{b}  y_{c}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{b}  y_{a}  y_{c}  y_{d}  u_{c,d,a,b}    c^{\dagger}_{a, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \downarrow} c^{}_{b, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{a}  x_{b}  x_{c}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{}_{d, \downarrow} c^{}_{c, \uparrow} c^{}_{b, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  u_{c,d,a,b}    c^{}_{d, \downarrow} c^{}_{c, \downarrow} c^{}_{b, \uparrow} c^{}_{a, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  x_{b}  u_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \frac{1}{2} y_{a}^{2}  y_{b}^{2}  u_{a,b,a,b}   + \sum_{a \in L} y_{a}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} x_{a}  x_{c}  y_{b}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  u_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} y_{a}  y_{b}  y_{c}  y_{d}  u_{c,d,a,b}    c^{\dagger}_{a, \downarrow} c^{\dagger}_{b, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  u_{b,c,a,c}    c^{}_{b, \downarrow} c^{}_{a, \uparrow}  + \sum_{a \in L} e^{(0)}_{a}  x_{a}  y_{a}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{a, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} x_{a}  x_{b}  x_{d}  y_{c}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow} \]</p>
+            <p>\[ \sum_{a \in L} e^{(0)}_{a}  x_{a}  y_{a}    c^{}_{a, \downarrow} c^{}_{a, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  y_{a}  y_{b}  u_{b,c,a,c}    c^{\dagger}_{a, \downarrow} c^{}_{b, \downarrow}  + \sum_{a \in L} x_{a}^{2}  e^{(0)}_{a}    c^{\dagger}_{a, \uparrow} c^{}_{a, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \frac{1}{2} y_{a}^{2}  y_{b}^{2}  u_{a,b,a,b}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{a}  x_{b}  x_{c}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{}_{d, \downarrow} c^{}_{c, \uparrow} c^{}_{b, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} x_{a}  x_{b}  x_{c}  x_{d}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{}_{d, \uparrow} c^{}_{c, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  x_{b}  u_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{}_{b, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  u_{c,d,a,b}    c^{}_{d, \downarrow} c^{}_{c, \downarrow} c^{}_{b, \uparrow} c^{}_{a, \uparrow} - \sum_{a \in L} y_{a}^{2}  e^{(0)}_{a}    c^{\dagger}_{a, \downarrow} c^{}_{a, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} x_{a}  x_{b}  y_{c}  y_{d}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + \sum_{a \in L} e^{(0)}_{a}  x_{a}  y_{a}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{a, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  u_{b,c,a,c}    c^{}_{b, \downarrow} c^{}_{a, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} x_{a}  y_{b}  y_{c}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} y_{a}  y_{b}  y_{c}  y_{d}  u_{c,d,a,b}    c^{\dagger}_{a, \downarrow} c^{\dagger}_{b, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \downarrow}  + \sum_{a \in L} y_{a}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{b}  y_{a}  y_{c}  y_{d}  u_{c,d,a,b}    c^{\dagger}_{a, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \downarrow} c^{}_{b, \uparrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{c}^{2}  x_{a}  y_{b}  u_{a,c,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow}  + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} x_{a}  x_{c}  y_{b}  y_{d}  u_{a,d,b,c}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} c^{}_{d, \downarrow} c^{}_{c, \uparrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} x_{a}  x_{b}  x_{d}  y_{c}  u_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{}_{d, \uparrow} \]</p>
             <div class="page-header" id="sect-3">
                 <h2>Tvec</h2>
             </div>
-            <p>\[ t_{0}   + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow} \]</p>
+            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + t_{0}   + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
             <div class="page-header" id="sect-4">
                 <h2>The Spin Rep for Tilde and non Tilde</h2>
             </div>
             <p>\[  c^{}_{a, \uparrow}  +  c^{}_{b, \downarrow} \]</p>
             <div class="page-header" id="sect-5">
-                <h2>Ovlp at order 1</h2>
+                <h2>Ovlp</h2>
             </div>
-            <p>\[ \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}^{2}  \]</p>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} t^{(2)}_{a,b,c,d}^{2}   + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}^{2}   + t_{0}^{2}  \]</p>
             <div class="page-header" id="sect-6">
-                <h2>Ovlp at order 2</h2>
+                <h2>Energy</h2>
             </div>
-            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{4} t^{(2)}_{a,b,c,d}^{2}  \]</p>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{a}^{2}  t^{(1)}_{b,c}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} 2 e^{(0)}_{a}  x_{a}  y_{a}  t^{(1)}_{b,c}  t^{(2)}_{a,b,a,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} t_{0} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{a,c,b,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} t_{0} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{b,c,a,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{1}{4} y_{a}^{2}  t^{(2)}_{b,c,d,i}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} y_{i}^{2}  x_{c}  y_{d}  t^{(1)}_{a,b}  t^{(2)}_{a,c,b,d}  u_{c,i,d,i}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} y_{i}^{2}  x_{c}  y_{d}  t^{(1)}_{a,b}  t^{(2)}_{a,c,b,d}  u_{d,i,c,i}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{1}{2} x_{a}  x_{c}  x_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{c,d,b,i}  u_{a,i,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{1}{2} x_{a}  x_{c}  x_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{c,d,b,i}  u_{c,d,a,i}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L}  \frac{1}{2} x_{c}  y_{b}  y_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{a,c,d,i}  u_{b,c,d,i}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L}  \frac{1}{2} x_{c}  y_{b}  y_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{a,c,d,i}  u_{d,i,b,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{a}^{2}  t^{(2)}_{a,b,c,d}^{2}  e^{(0)}_{a}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} y_{a}^{2}  t^{(2)}_{b,c,a,d}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} y_{c}^{2}  y_{d}^{2}  t^{(1)}_{a,b}^{2}  u_{c,d,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} y_{d}^{2}  x_{a}  x_{b}  t^{(1)}_{a,c}  t^{(1)}_{b,c}  u_{a,d,b,d}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} y_{d}^{2}  y_{b}  y_{c}  t^{(1)}_{a,b}  t^{(1)}_{a,c}  u_{b,d,c,d}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} x_{a}  x_{b}  y_{c}  y_{d}  t^{(1)}_{a,d}  t^{(1)}_{b,c}  u_{a,c,b,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{t_{0}}{4} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{a,b,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{t_{0}}{4} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{c,d,a,b}   + \sum_{a \in L} \sum_{b \in L} x_{a}^{2}  t^{(1)}_{a,b}^{2}  e^{(0)}_{a}  - \sum_{a \in L} \sum_{b \in L} y_{a}^{2}  t^{(1)}_{b,a}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \frac{t_{0}^{2}}{2} y_{a}^{2}  y_{b}^{2}  u_{a,b,a,b}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{8} y_{i}^{2}  y_{j}^{2}  t^{(2)}_{a,b,c,d}^{2}  u_{i,j,i,j}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{2} y_{j}^{2}  x_{b}  x_{c}  t^{(2)}_{a,b,d,i}  t^{(2)}_{a,c,d,i}  u_{b,j,c,j}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{1}{2} y_{j}^{2}  y_{d}  y_{i}  t^{(2)}_{a,b,c,d}  t^{(2)}_{a,b,c,i}  u_{d,j,i,j}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} x_{b}  x_{c}  y_{i}  y_{j}  t^{(2)}_{a,b,d,j}  t^{(2)}_{a,c,d,i}  u_{b,i,c,j}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{8} x_{a}  x_{b}  x_{c}  x_{d}  t^{(2)}_{a,b,i,j}  t^{(2)}_{c,d,i,j}  u_{a,b,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{8} y_{c}  y_{d}  y_{i}  y_{j}  t^{(2)}_{a,b,c,d}  t^{(2)}_{a,b,i,j}  u_{c,d,i,j}   + \sum_{a \in L} t_{0}^{2} y_{a}^{2}  e^{(0)}_{a}   + \sum_{a \in L} 2 t_{0} e^{(0)}_{a}  x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
             <div class="page-header" id="sect-7">
-                <h2>MP1 Energy</h2>
-            </div>
-            <p>\[ \sum_{a \in L} \sum_{b \in L} x_{a}^{2}  t^{(1)}_{a,b}^{2}  e^{(0)}_{a}  - \sum_{a \in L} \sum_{b \in L} y_{a}^{2}  t^{(1)}_{b,a}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \frac{t_{0}^{2}}{2} y_{a}^{2}  y_{b}^{2}  u_{a,b,a,b}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} y_{a}^{2}  t^{(1)}_{b,c}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} t_{0} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{a,c,b,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} t_{0} y_{c}^{2}  x_{a}  y_{b}  t^{(1)}_{a,b}  u_{b,c,a,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} y_{c}^{2}  y_{d}^{2}  t^{(1)}_{a,b}^{2}  u_{c,d,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} y_{d}^{2}  x_{a}  x_{b}  t^{(1)}_{a,c}  t^{(1)}_{b,c}  u_{a,d,b,d}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} y_{d}^{2}  y_{b}  y_{c}  t^{(1)}_{a,b}  t^{(1)}_{a,c}  u_{b,d,c,d}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} x_{a}  x_{b}  y_{c}  y_{d}  t^{(1)}_{a,d}  t^{(1)}_{b,c}  u_{a,c,b,d}   + \sum_{a \in L} 2 t_{0} e^{(0)}_{a}  x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
-            <div class="page-header" id="sect-8">
-                <h2>MP2 Energy</h2>
-            </div>
-            <p>\[ \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{8} y_{i}^{2}  y_{j}^{2}  t^{(2)}_{a,b,c,d}^{2}  u_{i,j,i,j}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{2} y_{j}^{2}  x_{b}  x_{c}  t^{(2)}_{a,b,d,i}  t^{(2)}_{a,c,d,i}  u_{b,j,c,j}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L}  \frac{1}{2} y_{j}^{2}  y_{d}  y_{i}  t^{(2)}_{a,b,c,d}  t^{(2)}_{a,b,c,i}  u_{d,j,i,j}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} x_{b}  x_{c}  y_{i}  y_{j}  t^{(2)}_{a,b,d,j}  t^{(2)}_{a,c,d,i}  u_{b,i,c,j}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{8} x_{a}  x_{b}  x_{c}  x_{d}  t^{(2)}_{a,b,i,j}  t^{(2)}_{c,d,i,j}  u_{a,b,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \sum_{j \in L} \frac{1}{8} y_{c}  y_{d}  y_{i}  y_{j}  t^{(2)}_{a,b,c,d}  t^{(2)}_{a,b,i,j}  u_{c,d,i,j}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{1}{2} x_{a}^{2}  t^{(2)}_{a,b,c,d}^{2}  e^{(0)}_{a}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{2} y_{a}^{2}  t^{(2)}_{b,c,a,d}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{t_{0}}{4} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{a,b,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{t_{0}}{4} x_{a}  x_{b}  y_{c}  y_{d}  t^{(2)}_{a,b,c,d}  u_{c,d,a,b}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} 2 e^{(0)}_{a}  x_{a}  y_{a}  t^{(1)}_{b,c}  t^{(2)}_{a,b,a,c}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{1}{4} y_{a}^{2}  t^{(2)}_{b,c,d,i}^{2}  e^{(0)}_{a}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} y_{i}^{2}  x_{c}  y_{d}  t^{(1)}_{a,b}  t^{(2)}_{a,c,b,d}  u_{c,i,d,i}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} y_{i}^{2}  x_{c}  y_{d}  t^{(1)}_{a,b}  t^{(2)}_{a,c,b,d}  u_{d,i,c,i}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{1}{2} x_{a}  x_{c}  x_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{c,d,b,i}  u_{a,i,c,d}   + \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{1}{2} x_{a}  x_{c}  x_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{c,d,b,i}  u_{c,d,a,i}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L}  \frac{1}{2} x_{c}  y_{b}  y_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{a,c,d,i}  u_{b,c,d,i}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L}  \frac{1}{2} x_{c}  y_{b}  y_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{a,c,d,i}  u_{d,i,b,c}  \]</p>
-            <div class="page-header" id="sect-9">
                 <h2>Intermediate Eqn 0</h2>
             </div>
-            <p>\[ \tau^{(0)}_{a} = \sum_{b \in L} t^{(1)}_{a,b}^{2}  \]</p>
-            <div class="page-header" id="sect-10">
+            <p>\[ \tau^{(0)}_{a,b} = \sum_{c \in L} \sum_{d \in L} t^{(1)}_{c,d}  t^{(2)}_{c,a,d,b}  \]</p>
+            <div class="page-header" id="sect-8">
                 <h2>Intermediate Eqn 1</h2>
             </div>
-            <p>\[ \tau^{(1)}_{a} = \sum_{b \in L} t^{(1)}_{b,a}^{2}  \]</p>
-            <div class="page-header" id="sect-11">
+            <p>\[ \tau^{(1)}_{a,b} = t_{0} t^{(1)}_{a,b}   + \tau^{(0)}_{a,b}  \]</p>
+            <div class="page-header" id="sect-9">
                 <h2>Intermediate Eqn 2</h2>
             </div>
-            <p>\[ \tau_{2} = \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}^{2}  \]</p>
-            <div class="page-header" id="sect-12">
+            <p>\[ \tau^{(2)}_{a,b} = \sum_{c \in L} 2 t^{(1)}_{c,a}  t^{(1)}_{c,b}   + \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} t^{(2)}_{i,d,c,a}  t^{(2)}_{i,d,c,b}  \]</p>
+            <div class="page-header" id="sect-10">
                 <h2>Intermediate Eqn 3</h2>
             </div>
-            <p>\[ \tau^{(3)}_{a,b} = \sum_{c \in L} t^{(1)}_{c,a}  t^{(1)}_{c,b}  \]</p>
-            <div class="page-header" id="sect-13">
+            <p>\[ \tau^{(3)}_{a,b} = \sum_{c \in L} 2 t^{(1)}_{a,c}  t^{(1)}_{b,c}   + \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} t^{(2)}_{i,a,d,c}  t^{(2)}_{i,b,d,c}  \]</p>
+            <div class="page-header" id="sect-11">
                 <h2>Intermediate Eqn 4</h2>
             </div>
-            <p>\[ \tau^{(4)}_{a,b} = \sum_{c \in L} t^{(1)}_{a,c}  t^{(1)}_{b,c}  \]</p>
-            <div class="page-header" id="sect-14">
+            <p>\[ \tau^{(4)}_{a,b} = x_{b}  y_{a}  \tau^{(1)}_{b,a}  -  \frac{1}{2} y_{a}  y_{b}  \tau^{(2)}_{b,a}   + \frac{1}{2} x_{a}  x_{b}  \tau^{(3)}_{b,a}  \]</p>
+            <div class="page-header" id="sect-12">
                 <h2>Intermediate Eqn 5</h2>
             </div>
-            <p>\[ \tau^{(5)}_{a,b} = t_{0} y_{b}  t^{(1)}_{a,b}   + x_{b}  \tau^{(4)}_{a,b}  \]</p>
-            <div class="page-header" id="sect-15">
+            <p>\[ \tau_{5} = \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}^{2}  \]</p>
+            <div class="page-header" id="sect-13">
                 <h2>Intermediate Eqn 6</h2>
             </div>
-            <p>\[ \tau^{(6)}_{a,b} = - y_{a}  y_{b}  \tau^{(3)}_{a,b}   + x_{b}  \tau^{(5)}_{b,a}  \]</p>
-            <div class="page-header" id="sect-16">
+            <p>\[ \tau_{6} = \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{a,b,c,d}^{2}  \]</p>
+            <div class="page-header" id="sect-14">
                 <h2>Intermediate Eqn 7</h2>
             </div>
-            <p>\[ \tau^{(7)}_{a} = t_{0}^{2} y_{a}^{2}   + \tau_{2} y_{a}^{2}  \]</p>
-            <div class="page-header" id="sect-17">
+            <p>\[ \tau_{7} = 4 \tau_{5}   + \tau_{6}  \]</p>
+            <div class="page-header" id="sect-15">
                 <h2>Intermediate Eqn 8</h2>
             </div>
-            <p>\[ \tau^{(8)}_{a} = - e^{(0)}_{a}  \tau^{(1)}_{a}   + \tau_{2} e^{(0)}_{a}   + \sum_{b \in L} \sum_{c \in L} t_{0} x_{b}  y_{c}  t^{(1)}_{b,c}  u_{a,c,a,b}   + \sum_{b \in L} \sum_{c \in L} \tau^{(6)}_{b,c}  u_{a,c,a,b}   + \sum_{b \in L} \frac{1}{2} \tau^{(7)}_{b}  u_{b,a,b,a}  \]</p>
-            <div class="page-header" id="sect-18">
+            <p>\[ \tau^{(8)}_{a} = t_{0}^{2} y_{a}^{2}   + \frac{\tau_{7}}{4} y_{a}^{2}  \]</p>
+            <div class="page-header" id="sect-16">
                 <h2>Intermediate Eqn 9</h2>
             </div>
-            <p>\[ \tau^{(9)}_{a,b} = - \sum_{c \in L} \sum_{d \in L} x_{c}  y_{d}  t^{(1)}_{c,d}  u_{a,c,d,b}  \]</p>
-            <div class="page-header" id="sect-19">
+            <p>\[ \tau^{(9)}_{a} = \sum_{b \in L} 2 t^{(1)}_{b,a}^{2}   + \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{b,c,a,d}^{2}  \]</p>
+            <div class="page-header" id="sect-17">
                 <h2>Intermediate Eqn 10</h2>
             </div>
-            <p>\[ \tau^{(10)}_{a} = 2 t_{0} e^{(0)}_{a}  x_{a}  t^{(1)}_{a,a}   + \sum_{b \in L} x_{b}  t^{(1)}_{b,a}  \tau^{(9)}_{a,b}  \]</p>
-            <div class="page-header" id="sect-20">
+            <p>\[ \tau^{(10)}_{a} = t_{0}^{2} e^{(0)}_{a}   + \sum_{b \in L} \sum_{c \in L} \tau^{(4)}_{c,b}  u_{a,b,a,c}   + \sum_{b \in L} \sum_{c \in L} x_{c}  y_{b}  \tau^{(1)}_{c,b}  u_{a,b,a,c}   + \sum_{b \in L} \frac{1}{2} \tau^{(8)}_{b}  u_{b,a,b,a}  -  \frac{1}{2} e^{(0)}_{a}  \tau^{(9)}_{a}   + \frac{\tau_{7}}{4} e^{(0)}_{a}  \]</p>
+            <div class="page-header" id="sect-18">
                 <h2>Intermediate Eqn 11</h2>
             </div>
-            <p>\[ \tau^{(11)}_{a} = \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{a,b,c,d}^{2}  \]</p>
-            <div class="page-header" id="sect-21">
+            <p>\[ \tau^{(11)}_{a,b,c,d} = u_{b,a,d,c}   + u_{d,c,b,a}  \]</p>
+            <div class="page-header" id="sect-19">
                 <h2>Intermediate Eqn 12</h2>
             </div>
-            <p>\[ \tau^{(12)}_{a} = \sum_{b \in L} \sum_{c \in L} t^{(1)}_{c,b}  t^{(2)}_{a,c,a,b}  \]</p>
-            <div class="page-header" id="sect-22">
+            <p>\[ \tau^{(12)}_{a,b,c,d} = \sum_{i \in L} \sum_{j \in L} t^{(2)}_{a,c,i,j}  t^{(2)}_{b,d,i,j}  \]</p>
+            <div class="page-header" id="sect-20">
                 <h2>Intermediate Eqn 13</h2>
             </div>
-            <p>\[ \tau^{(13)}_{a,b,c,d} = u_{b,a,d,c}   + u_{d,c,b,a}  \]</p>
-            <div class="page-header" id="sect-23">
+            <p>\[ \tau^{(13)}_{a,b,c,d} = t^{(1)}_{a,c}  t^{(1)}_{b,d}   + \sum_{i \in L} \sum_{j \in L} t^{(2)}_{j,a,i,c}  t^{(2)}_{j,b,i,d}  \]</p>
+            <div class="page-header" id="sect-21">
                 <h2>Intermediate Eqn 14</h2>
             </div>
-            <p>\[ \tau^{(14)}_{a,b,c,d} = \sum_{i \in L} \sum_{j \in L} t^{(2)}_{j,i,a,c}  t^{(2)}_{j,i,b,d}  \]</p>
-            <div class="page-header" id="sect-24">
+            <p>\[ \tau^{(14)}_{a,b,c,d} = - x_{a}  x_{c}  x_{d}  \tau^{(12)}_{b,a,c,d}   + 8 x_{a}  y_{c}  y_{d}  \tau^{(13)}_{b,a,d,c}  \]</p>
+            <div class="page-header" id="sect-22">
                 <h2>Intermediate Eqn 15</h2>
             </div>
-            <p>\[ \tau^{(15)}_{a,b,c,d} = \sum_{i \in L} \sum_{j \in L} t^{(2)}_{j,a,i,c}  t^{(2)}_{j,b,i,d}  \]</p>
-            <div class="page-header" id="sect-25">
+            <p>\[ \tau^{(15)}_{a,b,c,d} = t^{(2)}_{a,b,c,d}  u_{b,a,d,c}   + t^{(2)}_{b,a,c,d}  u_{d,c,a,b}  \]</p>
+            <div class="page-header" id="sect-23">
                 <h2>Intermediate Eqn 16</h2>
             </div>
-            <p>\[ \tau^{(16)}_{a,b} = - \sum_{c \in L} \sum_{d \in L} y_{c}  y_{d}  \tau^{(14)}_{a,c,b,d}  u_{d,c,b,a}   + \sum_{c \in L} \sum_{d \in L} 8 x_{c}  x_{d}  \tau^{(15)}_{d,c,a,b}  u_{a,c,b,d}  \]</p>
-            <div class="page-header" id="sect-26">
+            <p>\[ \tau^{(16)}_{a} = t_{0} t^{(1)}_{a,a}   + \sum_{b \in L} \sum_{c \in L} t^{(1)}_{b,c}  t^{(2)}_{a,b,a,c}  \]</p>
+            <div class="page-header" id="sect-24">
                 <h2>Intermediate Eqn 17</h2>
             </div>
-            <p>\[ \tau^{(17)}_{a} = e^{(0)}_{a}  \tau^{(12)}_{a}  x_{a}   + \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} \frac{1}{4} x_{c}  y_{d}  y_{i}  t^{(1)}_{b,a}  t^{(2)}_{b,c,i,d}  \tau^{(13)}_{a,c,d,i}   + \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{t_{0}}{8} x_{b}  x_{c}  y_{d}  t^{(2)}_{b,c,a,d}  \tau^{(13)}_{a,d,b,c}  - \sum_{b \in L}  \frac{1}{16} y_{b}  \tau^{(16)}_{a,b}  \]</p>
-            <div class="page-header" id="sect-27">
+            <p>\[ \tau^{(17)}_{a} = - \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L}  \frac{1}{4} x_{c}  x_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{d,c,b,i}  \tau^{(11)}_{c,d,a,i}  - \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{16} \tau^{(14)}_{d,a,b,c}  u_{b,a,c,d}   + \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \frac{t_{0}}{8} x_{b}  y_{c}  y_{d}  \tau^{(15)}_{b,a,d,c}   + e^{(0)}_{a}  \tau^{(16)}_{a}  y_{a}  \]</p>
+            <div class="page-header" id="sect-25">
                 <h2>Intermediate Eqn 18</h2>
             </div>
-            <p>\[ \tau^{(18)}_{a,b,c,d} = \sum_{i \in L} \sum_{j \in L} t^{(2)}_{a,c,i,j}  t^{(2)}_{b,d,i,j}  \]</p>
-            <div class="page-header" id="sect-28">
+            <p>\[ \tau^{(18)}_{a,b,c,d} = \sum_{i \in L} \sum_{j \in L} t^{(2)}_{j,i,a,c}  t^{(2)}_{j,i,b,d}  \]</p>
+            <div class="page-header" id="sect-26">
                 <h2>Intermediate Eqn 19</h2>
             </div>
-            <p>\[ \tau^{(19)}_{a,b} = \sum_{c \in L} \sum_{d \in L} x_{c}  x_{d}  \tau^{(18)}_{c,a,d,b}  u_{b,a,d,c}  \]</p>
-            <div class="page-header" id="sect-29">
+            <p>\[ \tau^{(19)}_{a,b} = \sum_{c \in L} \sum_{d \in L} y_{c}  y_{d}  \tau^{(18)}_{b,a,d,c}  u_{c,a,d,b}  \]</p>
+            <div class="page-header" id="sect-27">
                 <h2>Intermediate Eqn 20</h2>
             </div>
-            <p>\[ \tau^{(20)}_{a} = \sum_{b \in L} x_{b}  \tau^{(19)}_{b,a}  - \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} 4 x_{c}  x_{d}  y_{i}  t^{(1)}_{a,b}  t^{(2)}_{d,c,b,i}  \tau^{(13)}_{c,d,a,i}  \]</p>
-            <div class="page-header" id="sect-30">
+            <p>\[ \tau^{(20)}_{a} = - \sum_{b \in L} y_{b}  \tau^{(19)}_{b,a}  - \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} 4 x_{c}  y_{d}  y_{i}  t^{(1)}_{b,a}  t^{(2)}_{b,c,i,d}  \tau^{(11)}_{d,i,a,c}  \]</p>
+            <div class="page-header" id="sect-28">
                 <h2>Intermediate Eqn 21</h2>
             </div>
-            <p>\[ \tau_{21} = \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{a,b,c,d}^{2}  \]</p>
-            <div class="page-header" id="sect-31">
+            <p>\[ \tau^{(21)}_{a} = \sum_{b \in L} 2 t^{(1)}_{a,b}^{2}   + \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{a,b,c,d}^{2}  \]</p>
+            <div class="page-header" id="sect-29">
                 <h2>Intermediate Eqn 22</h2>
             </div>
-            <p>\[ \tau^{(22)}_{a} = 2 e^{(0)}_{a}   + \sum_{b \in L} y_{b}^{2}  u_{a,b,a,b}  \]</p>
-            <div class="page-header" id="sect-32">
+            <p>\[ e = \sum_{a \in L} y_{a}^{2}  \tau^{(10)}_{a}   + \sum_{a \in L} 2 \tau^{(17)}_{a}  x_{a}  - \sum_{a \in L}  \frac{1}{8} \tau^{(20)}_{a}  y_{a}   + \sum_{a \in L} \frac{1}{2} x_{a}^{2}  e^{(0)}_{a}  \tau^{(21)}_{a}  \]</p>
+            <div class="page-header" id="sect-30">
                 <h2>Intermediate Eqn 23</h2>
             </div>
-            <p>\[ \tau_{23} = \sum_{a \in L} y_{a}^{2}  \tau^{(22)}_{a}  \]</p>
-            <div class="page-header" id="sect-33">
-                <h2>Intermediate Eqn 24</h2>
-            </div>
-            <p>\[ \tau^{(24)}_{a} = \sum_{b \in L} \sum_{c \in L} \sum_{d \in L} t^{(2)}_{b,c,a,d}^{2}  \]</p>
-            <div class="page-header" id="sect-34">
-                <h2>Intermediate Eqn 25</h2>
-            </div>
-            <p>\[ \tau^{(25)}_{a,b} = \sum_{c \in L} \sum_{d \in L} t^{(1)}_{d,c}  t^{(2)}_{d,a,c,b}  \]</p>
-            <div class="page-header" id="sect-35">
-                <h2>Intermediate Eqn 26</h2>
-            </div>
-            <p>\[ \tau^{(26)}_{a,b} = \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} t^{(2)}_{i,c,d,a}  t^{(2)}_{i,c,d,b}  \]</p>
-            <div class="page-header" id="sect-36">
-                <h2>Intermediate Eqn 27</h2>
-            </div>
-            <p>\[ \tau^{(27)}_{a,b} = \sum_{c \in L} \sum_{d \in L} \sum_{i \in L} t^{(2)}_{i,a,c,d}  t^{(2)}_{i,b,c,d}  \]</p>
-            <div class="page-header" id="sect-37">
-                <h2>Intermediate Eqn 28</h2>
-            </div>
-            <p>\[ \tau^{(28)}_{a,b} = 2 y_{b}  \tau^{(25)}_{a,b}   + x_{b}  \tau^{(27)}_{a,b}  \]</p>
-            <div class="page-header" id="sect-38">
-                <h2>Intermediate Eqn 29</h2>
-            </div>
-            <p>\[ \tau^{(29)}_{a,b} = - y_{a}  y_{b}  \tau^{(26)}_{a,b}   + x_{a}  \tau^{(28)}_{a,b}  \]</p>
-            <div class="page-header" id="sect-39">
-                <h2>Intermediate Eqn 30</h2>
-            </div>
-            <p>\[ \tau^{(30)}_{a} = - e^{(0)}_{a}  \tau^{(24)}_{a}   + \sum_{b \in L} \sum_{c \in L} 2 x_{b}  y_{c}  \tau^{(25)}_{b,c}  u_{a,c,a,b}   + \sum_{b \in L} \sum_{c \in L} \tau^{(29)}_{b,c}  u_{a,b,a,c}  \]</p>
-            <div class="page-header" id="sect-40">
-                <h2>Intermediate Eqn 31</h2>
-            </div>
-            <p>\[ e_{1} = \sum_{a \in L} x_{a}^{2}  e^{(0)}_{a}  \tau^{(0)}_{a}   + \sum_{a \in L} y_{a}^{2}  \tau^{(8)}_{a}   + \sum_{a \in L} \tau^{(10)}_{a}  y_{a}  \]</p>
-            <div class="page-header" id="sect-41">
-                <h2>Intermediate Eqn 32</h2>
-            </div>
-            <p>\[ e_{2} = \sum_{a \in L} \frac{1}{2} x_{a}^{2}  e^{(0)}_{a}  \tau^{(11)}_{a}   + \sum_{a \in L} 2 \tau^{(17)}_{a}  y_{a}   + \sum_{a \in L} \frac{1}{8} \tau^{(20)}_{a}  x_{a}   + \frac{\tau_{21} \tau_{23}}{8}   + \sum_{a \in L} \frac{1}{2} y_{a}^{2}  \tau^{(30)}_{a}  \]</p>
-            <div class="page-header" id="sect-42">
-                <h2>Intermediate Eqn 33</h2>
-            </div>
-            <p>\[ ov_{1} = \tau_{2}  \]</p>
-            <div class="page-header" id="sect-43">
-                <h2>Intermediate Eqn 34</h2>
-            </div>
-            <p>\[ ov_{2} = \frac{\tau_{21}}{4}  \]</p>
+            <p>\[ ov = t_{0}^{2}   + \frac{\tau_{6}}{4}   + \tau_{5}  \]</p>
         </div>
 
         <!-- The navigation -->
@@ -218,45 +166,32 @@
                 <li ><a href="#sect-2">Thermal Ham</a></li>
                 <li ><a href="#sect-3">Tvec</a></li>
                 <li ><a href="#sect-4">The Spin Rep for Tilde and non Tilde</a></li>
-                <li ><a href="#sect-5">Ovlp at order 1</a></li>
-                <li ><a href="#sect-6">Ovlp at order 2</a></li>
-                <li ><a href="#sect-7">MP1 Energy</a></li>
-                <li ><a href="#sect-8">MP2 Energy</a></li>
-                <li ><a href="#sect-9">Intermediate Eqn 0</a></li>
-                <li ><a href="#sect-10">Intermediate Eqn 1</a></li>
-                <li ><a href="#sect-11">Intermediate Eqn 2</a></li>
-                <li ><a href="#sect-12">Intermediate Eqn 3</a></li>
-                <li ><a href="#sect-13">Intermediate Eqn 4</a></li>
-                <li ><a href="#sect-14">Intermediate Eqn 5</a></li>
-                <li ><a href="#sect-15">Intermediate Eqn 6</a></li>
-                <li ><a href="#sect-16">Intermediate Eqn 7</a></li>
-                <li ><a href="#sect-17">Intermediate Eqn 8</a></li>
-                <li ><a href="#sect-18">Intermediate Eqn 9</a></li>
-                <li ><a href="#sect-19">Intermediate Eqn 10</a></li>
-                <li ><a href="#sect-20">Intermediate Eqn 11</a></li>
-                <li ><a href="#sect-21">Intermediate Eqn 12</a></li>
-                <li ><a href="#sect-22">Intermediate Eqn 13</a></li>
-                <li ><a href="#sect-23">Intermediate Eqn 14</a></li>
-                <li ><a href="#sect-24">Intermediate Eqn 15</a></li>
-                <li ><a href="#sect-25">Intermediate Eqn 16</a></li>
-                <li ><a href="#sect-26">Intermediate Eqn 17</a></li>
-                <li ><a href="#sect-27">Intermediate Eqn 18</a></li>
-                <li ><a href="#sect-28">Intermediate Eqn 19</a></li>
-                <li ><a href="#sect-29">Intermediate Eqn 20</a></li>
-                <li ><a href="#sect-30">Intermediate Eqn 21</a></li>
-                <li ><a href="#sect-31">Intermediate Eqn 22</a></li>
-                <li ><a href="#sect-32">Intermediate Eqn 23</a></li>
-                <li ><a href="#sect-33">Intermediate Eqn 24</a></li>
-                <li ><a href="#sect-34">Intermediate Eqn 25</a></li>
-                <li ><a href="#sect-35">Intermediate Eqn 26</a></li>
-                <li ><a href="#sect-36">Intermediate Eqn 27</a></li>
-                <li ><a href="#sect-37">Intermediate Eqn 28</a></li>
-                <li ><a href="#sect-38">Intermediate Eqn 29</a></li>
-                <li ><a href="#sect-39">Intermediate Eqn 30</a></li>
-                <li ><a href="#sect-40">Intermediate Eqn 31</a></li>
-                <li ><a href="#sect-41">Intermediate Eqn 32</a></li>
-                <li ><a href="#sect-42">Intermediate Eqn 33</a></li>
-                <li ><a href="#sect-43">Intermediate Eqn 34</a></li>
+                <li ><a href="#sect-5">Ovlp</a></li>
+                <li ><a href="#sect-6">Energy</a></li>
+                <li ><a href="#sect-7">Intermediate Eqn 0</a></li>
+                <li ><a href="#sect-8">Intermediate Eqn 1</a></li>
+                <li ><a href="#sect-9">Intermediate Eqn 2</a></li>
+                <li ><a href="#sect-10">Intermediate Eqn 3</a></li>
+                <li ><a href="#sect-11">Intermediate Eqn 4</a></li>
+                <li ><a href="#sect-12">Intermediate Eqn 5</a></li>
+                <li ><a href="#sect-13">Intermediate Eqn 6</a></li>
+                <li ><a href="#sect-14">Intermediate Eqn 7</a></li>
+                <li ><a href="#sect-15">Intermediate Eqn 8</a></li>
+                <li ><a href="#sect-16">Intermediate Eqn 9</a></li>
+                <li ><a href="#sect-17">Intermediate Eqn 10</a></li>
+                <li ><a href="#sect-18">Intermediate Eqn 11</a></li>
+                <li ><a href="#sect-19">Intermediate Eqn 12</a></li>
+                <li ><a href="#sect-20">Intermediate Eqn 13</a></li>
+                <li ><a href="#sect-21">Intermediate Eqn 14</a></li>
+                <li ><a href="#sect-22">Intermediate Eqn 15</a></li>
+                <li ><a href="#sect-23">Intermediate Eqn 16</a></li>
+                <li ><a href="#sect-24">Intermediate Eqn 17</a></li>
+                <li ><a href="#sect-25">Intermediate Eqn 18</a></li>
+                <li ><a href="#sect-26">Intermediate Eqn 19</a></li>
+                <li ><a href="#sect-27">Intermediate Eqn 20</a></li>
+                <li ><a href="#sect-28">Intermediate Eqn 21</a></li>
+                <li ><a href="#sect-29">Intermediate Eqn 22</a></li>
+                <li ><a href="#sect-30">Intermediate Eqn 23</a></li>
             </ul>
         </div>
     </div> <!-- end the main row -->

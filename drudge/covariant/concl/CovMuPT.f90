@@ -10,7 +10,6 @@
 
           Real (Kind=8) :: tau0
           Real (Kind=8), dimension(:, :, :, :), allocatable :: tau1
-          Real (Kind=8), dimension(:, :, :, :), allocatable :: tau2
 
           !$omp parallel default(shared)
 
@@ -129,8 +128,8 @@
               do b=1, na
                   do c=1, na
           
-                      tau1(a, b, c, a) = tau1(a, b, c, a) - t1(c, b)          
-
+                      tau1(a, b, c, a) = tau1(a, b, c, a) - t1(c, b)
+          
                   end do
               end do
           end do
@@ -152,46 +151,6 @@
           end do
           !$omp end do
 
-          deallocate(tau1)
-
-          allocate(tau2(1:na, 1:na, 1:na, 1:na))
-          !$omp do schedule(static)
-          do a=1, na
-              do b=1, na
-                  do c=1, na
-                      do d=1, na
-                          tau2(a, b, c, d) = 0.0
-                      end do
-                  end do
-              end do
-          end do
-          !$omp end do
-          
-
-          !$omp do schedule(static)
-          do a=1, na
-              do c=1, na
-                  do d=1, na
-          
-                      tau2(a, a, c, d) = tau2(a, a, c, d) - t1(c, d)          
-
-                  end do
-              end do
-          end do
-          !$omp end do
-
-          !$omp do schedule(static)
-          do a=1, na
-              do b=1, na
-                  do c=1, na
-          
-                      tau2(a, b, c, a) = tau2(a, b, c, a) + t1(c, b)
-          
-                  end do
-              end do
-          end do
-          !$omp end do
-
           !$omp do schedule(static)
           do a=1, na
               do b=1, na
@@ -199,7 +158,7 @@
                       do d=1, na
           
                           rt2(a, b, c, d) = rt2(a, b, c, d) - ( &
-                              x(b) * y(b) * tau2(b, d, a, c) / 2&
+                              x(b) * y(b) * tau1(b, c, a, d) / 2&
                           )
           
                       end do
@@ -208,7 +167,7 @@
           end do
           !$omp end do
 
-          deallocate(tau2)
+          deallocate(tau1)
 
           !$omp do schedule(static) reduction(+:rt0)
           
@@ -218,6 +177,18 @@
               )
           end do
           
+          !$omp end do
+
+          !$omp do schedule(static)
+          do a=1, na
+              do b=1, na
+                  do c=1, na
+                      rt1(a, b) = rt1(a, b) - ( &
+                          x(c) * y(c) * t2(c, a, b, c) / 2&
+                      )
+                  end do
+              end do
+          end do
           !$omp end do
 
           !$omp do schedule(static)
@@ -247,20 +218,8 @@
           !$omp do schedule(static)
           do a=1, na
           
-              rt1(a, b) = rt1(a, b) + ( x(a) * y(a) / 2)
+              rt1(a, a) = rt1(a, a) + ( t0 * x(a) * y(a) / 2 )
           
-          end do
-          !$omp end do
-
-          !$omp do schedule(static)
-          do a=1, na
-              do b=1, na
-                  do c=1, na
-                      rt1(a, b) = rt1(a, b) - ( &
-                          x(c) * y(c) * t2(c, a, b, c) / 2&
-                      )
-                  end do
-              end do
           end do
           !$omp end do
 
