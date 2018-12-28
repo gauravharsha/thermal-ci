@@ -1,0 +1,9 @@
+#!/bin/csh
+
+python3 Main_Covar.py
+python3 plotting.py
+rm ./Output_cov/*.pdf
+rm ./Output_cov/*.h5
+mv *_mp_*.pdf ./Output_cov/
+mv *_mp_*.h5 ./Output_cov/
+
