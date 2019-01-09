@@ -2,11 +2,9 @@ import numpy as np
 from itertools import permutations
 from scipy.misc import comb
 
-from CovMuPT import *
-from CovBetaPT import *
-from MuDerPT import *
-from BetaDerPT import *
-from EnAndOvlp import *
+from FixMuCISD import *
+from FixBetaCISD import *
+from FixEnAndOvlp import *
 
 import pdb
 
@@ -73,9 +71,9 @@ def T2_Compress(T2):
 
                     val = T2[i,j,k,l]
 
-                    chk1 = np.isclose(T2[j,i,k,l],-val,rtol=1e-7)
-                    chk2 = np.isclose(T2[i,j,l,k],-val,rtol=1e-7)
-                    chk3 = np.isclose(T2[j,i,l,k],val,rtol=1e-7)
+                    chk1 = np.isclose(T2[j,i,k,l],-val,rtol=1e-5)
+                    chk2 = np.isclose(T2[i,j,l,k],-val,rtol=1e-5)
+                    chk3 = np.isclose(T2[j,i,l,k],val,rtol=1e-5)
 
                     if chk1 and chk2 and chk3:
                         T2_compressed[m] = val
@@ -284,7 +282,7 @@ def T4_Compress(T4):
 """============================================================================="""
 
 
-def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
+def mu_evolve(Mu, TSamps, Tau, U, V, OneH):
     """
     Function that returns the RHS of the Differential equation set up
     Inputs:     
@@ -295,9 +293,7 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
                 Mu      ::  Chem Pot (off-set taken care of) as an independent
                             parameter without any Beta multiplication
                 Tau     ::  Inverse Temperature
-                Alpha   ::  Is the initial chemical potential that is used to set the number
-                            Alpha = n_elec / (nso + n_elec)
-                            u = 1 / np.sqrt( 1 + Alpha )
+                U,V     ::  HFB-Coefficients
                 OneH    ::  To compute the U and V on the Fly
     Returns:
                 Res0    ::  R0
@@ -308,10 +304,6 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     # Number of Spin Orbitals
     Nso = np.size(OneH,axis=0)
 
-    # Computing the HFB parameters
-    U = 1/np.sqrt( 1 + np.exp(-Tau*OneH)*Alpha )
-    V = np.exp( (-Tau*OneH)/2)*U*np.sqrt(Alpha)
-
     # lengths of different t and s tensors
     lent1 = int( comb(Nso,1)**2 )
     lent2 = int( comb(Nso,2)**2 )
@@ -321,36 +313,10 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     T1 = np.reshape(TSamps[1:1+lent1], (Nso,Nso))
     T2 = T2_Decompress(TSamps[1+lent1:],Nso)
     
-    dt0_dmu, dt1_dmu, dt2_dmu = covmupt(
+    dt0_dmu, dt1_dmu, dt2_dmu = fixmucisd(
         T0, T1, T2, U, V
     )
     
-    #####################################################
-    # DERIVATIVE: d T / dMu                             #
-    # We use the following notation                     #
-    #                                                   #
-    #   F00 = <0|  d(T) / d Mu |0>                      #
-    #   F10 = <1|  d(T) / d Mu |0>                      #
-    #   F20 = <2|  d(T) / d Mu |0>                      #
-    #                                                   #
-    #####################################################
-
-    # NOTE: The alpha / mu derivatives do not count here because the reference
-    #       does not depend, in any way, on the chemical potential / alpha, and
-    #       therefore, neither does the HFB transformation
-
-    # NOTE: The sequnce of code below is INCORRECT ANYWAY
-
-    # t0der, t1der, s0der, s1der, s2der, s3der = MuDerMP(1, T1, T2, S1, S2, S3, S4, U, V)
-
-    # dt0_dmu -= t0der
-    # dt1_dmu -= t1der 
-
-    # ds0_dmu -= s0der
-    # ds1_dmu -= s1der 
-    # ds2_dmu -= s2der
-    # ds3_dmu -= s3der 
-
     # Reshape the array as vectors and compress to send them out.
     dt1_dmu = np.reshape(dt1_dmu,(Nso)**2)
     dt2_dmu = T2_Compress(dt2_dmu)
@@ -358,7 +324,7 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     out = np.concatenate( ([dt0_dmu], dt1_dmu, dt2_dmu) )
     return out
 
-def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
+def beta_evolve(Tau, TSamps, U, V, OneH, Eri):
     """
     Function that returns the RHS of the Differential equation set up
     Inputs:     
@@ -371,9 +337,7 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
                             T2      ::  S2 amplitude matrix :: (Nso-choose-2)^2 elements
                 Mu      ::  Chemical potential (as an independent parameter
                             and not in multiplication with Beta
-                Alpha   ::  Is the initial chemical potential that is used to set the number
-                            Alpha = n_elec / (nso + n_elec)
-                            u = 1 / np.sqrt( 1 + Alpha )
+                U,V     ::  HFB-Coefficients
                 OneH    ::  One Dimenional Array for expression: Evals
                 Eri     ::  Two Elec Integrals in MO basis
     Returns:
@@ -384,10 +348,6 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     # Number of Spin Orbitals
     Nso = np.size(Eri,axis=0)
 
-    # Computing the HFB parameters
-    U = 1/np.sqrt( 1 + np.exp(-Tau*OneH)*Alpha )
-    V = np.exp( (-Tau*OneH)/2)*U*np.sqrt(Alpha)
-
     # lengths of different t and s tensors
     lent1 = int( comb(Nso,1)**2 )
     lent2 = int( comb(Nso,2)**2 )
@@ -397,26 +357,9 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     T1 = np.reshape(TSamps[1:1+lent1], (Nso,Nso))
     T2 = T2_Decompress(TSamps[1+lent1:],Nso)
     
-    dt0_dtau, dt1_dtau, dt2_dtau = covbetapt(
+    dt0_dtau, dt1_dtau, dt2_dtau = fixbetacisd(
         OneH, Eri, T0, T1, T2, U, V
     )
-
-    #####################################################
-    # TODO: This box is not for the MP - CHANGE         #
-    # DERIVATIVE: exp(-T) d exp(T)/dB                   #
-    # We use the following notation                     #
-    #                                                   #
-    #   F00 = <0| e^(-T) d e^(T) / d Beta |0>           #
-    #   F10 = <1| e^(-T) d e^(T) / d Beta |0>           #
-    #   F20 = <2| e^(-T) d e^(T) / d Beta |0>           #
-    #                                                   #
-    #####################################################
-    # First two arguments are beta, mu -- here we do not want any effect of either
-    t0der, t1der = betaderpt(OneH, 0, T1, T2, U, V)
-    # pdb.set_trace()
-
-    # dt0_dtau -= t0der
-    # dt1_dtau -= t1der
 
     # Reshape the array as vectors and compress to send them out.
     dt1_dtau = np.reshape(dt1_dtau,(Nso)**2)
@@ -429,14 +372,14 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
 # WRAPPER FUNCTIONS
 # 
 
-def beta_cis(Tau, Tamps, Alpha, OneH, Eri):
+def beta_cis(Tau, Tamps, U, V, OneH, Eri):
     """
     Wrapper function that returns the RHS for the CIS Theory approximation to the 
     Imaginary time Schrodinger equation set up
 
     """
     nso = len(OneH)
-    yout = beta_evolve(Tau, Tamps, Alpha, OneH, Eri)
+    yout = beta_evolve(Tau, Tamps, U, V, OneH, Eri)
 
     y_cis = yout*0
     y_cis[0] = yout[0]
@@ -444,14 +387,14 @@ def beta_cis(Tau, Tamps, Alpha, OneH, Eri):
 
     return y_cis
 
-def mu_cis(Mu, Tamps, Tau, Alpha, OneH):
+def mu_cis(Mu, Tamps, Tau, U, V, OneH):
     """
     Wrapper function that returns the RHS for the CIS Theory approximation to the 
     Imaginary time Schrodinger equation set up -- MU evolution
 
     """
     nso = len(OneH)
-    yout = mu_evolve(Mu, Tamps, Tau, Alpha, OneH)
+    yout = mu_evolve(Mu, Tamps, Tau, U, V, OneH)
 
     y_cis = yout*0
     y_cis[0] = yout[0]
@@ -461,27 +404,3 @@ def mu_cis(Mu, Tamps, Tau, Alpha, OneH):
 
 # def beta_cisd -- SAME AS THE BETA_EVOLVE FUNCTION
 # def mu_cisd -- SAME AS THE MU_EVOLVE FUNCTION
-
-def EnAndOvlpHF(OneH, Eri, t0, U, V):
-    """
-    Returns the Mean-Field Thermal Energy Expectation Value at
-    a given temperature BETA and chempot MU.
-
-    The info on BETA and MU is contained in the U and V, the HFB parameters
-    """
-
-    # Number of Spin Orbitals
-    Nso = np.size(OneH,axis=0)
-
-    # Energy from OneH
-    en = np.sum(OneH*V*V) * (t0**2)
-
-    # Energy from Eri
-    for i in range(Nso):
-        for j in range(Nso):
-            en += (1/2)*Eri[i,j,i,j]*( t0 * V[i] * V[j] )**2
-
-    # OVerlap
-    ov = t0**2
-
-    return en, ov

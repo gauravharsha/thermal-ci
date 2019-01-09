@@ -95,13 +95,16 @@ def loadHDF(fname):
     
     return mo_en, mo_eri, attr_list1
 
-def createh5(fp, dsets, max_size):
+def createh5(fp, dsets, max_size, attrs):
     zarr = np.zeros(max_size)
     dsetlist = []
     for ds in dsets:
         dsetlist.append(
             fp.create_dataset(ds, data=zarr)
         )
+        for tup in attrs:
+            dsetlist[-1].attrs[tup[0]] = tup[1]
+        
     return dsetlist
 
 def updateh5(dsets, vals, i_at):
@@ -212,7 +215,7 @@ def main():
 
     n_exp[0] = n_elec
 
-    print('Thermal Hartree Fock Energy at T = Inf is :',E_hf)
+    print('Thermal Hartree Fock Energy at T = Inf is :',e_hf[0])
     print('Thermal MP2 Corrected Energy at T = Inf is :',e_mp2[0])
     print('-------------------------------------------------------\n')
 
@@ -244,10 +247,14 @@ def main():
     dsets = ['beta','e_hf','e_mp2','chem_pot','t0rms','t1rms','t2rms','num']
 
     # Create all but the ystack data sets
-    dset_list = createh5(fp1, dsets, beta_pts)
-    dset_list.append(
-        fp1.create_dataset('tvals',data = np.zeros( (beta_pts, len(y0)) ))
-    )
+
+    dset_list = createh5(fp1, dsets, beta_pts, attrs)
+
+    dset_tvals = fp1.create_dataset('tvals',data=np.zeros(( beta_pts, len(y0)) ))
+    dset_list.append( dset_tvals )
+
+    for tup in attrs:
+        dset_tvals.attrs[tup[0]] = tup[1]
 
     # XXX: Another de-bugger
     # pdb.set_trace()
@@ -493,7 +500,7 @@ def main():
         # print('overlap correction at order 4: {}'.format(o_4))
         # pdb.set_trace()
 
-        e_mp2 = np.append(e_mp2, e_2/o_2 )
+        e_mp2 = np.append(e_mp2, e_nuc + e_2/o_2 )
 
         mu_cc = np.append(mu_cc,mu_f)
 
@@ -530,57 +537,16 @@ def main():
             break
 
 
+    #################################################################
+    #                                                               #
+    #       CLOSING THE CODE AND PRINT TIMING                       #
+    #                                                               #
+    #################################################################
+
     ode_time = time.time()
-
-
-    # TODO: If the code works, then remove this commented section
-    # dset1 = fp1.create_dataset('beta',data=beta_grid)
-    # for tup in attrs:
-    #     dset1.attrs[tup[0]] = tup[1]
-    # 
-    # dset2 = fp1.create_dataset('e_hf',data=e_hf)
-    # for tup in attrs:
-    #     dset2.attrs[tup[0]] = tup[1]
-
-    # dset2a = fp1.create_dataset('e_mp1',data=e_mp1)
-    # for tup in attrs:
-    #     dset2a.attrs[tup[0]] = tup[1]
-
-    # dset2b = fp1.create_dataset('e_mp2',data=e_mp2)
-    # for tup in attrs:
-    #     dset2b.attrs[tup[0]] = tup[1]
-    #     
-    # dset3 = fp1.create_dataset('chem_pot',data=mu_cc)
-    # for tup in attrs:
-    #     dset3.attrs[tup[0]] = tup[1]
-
-    # dset4 = fp1.create_dataset('t1rms',data=t1_rms)
-    # for tup in attrs:
-    #     dset4.attrs[tup[0]] = tup[1]
-
-    # dset5 = fp1.create_dataset('s1rms',data=s1_rms)
-    # for tup in attrs:
-    #     dset5.attrs[tup[0]] = tup[1]
-
-    # dset6 = fp1.create_dataset('t2rms',data=t2_rms)
-    # for tup in attrs:
-    #     dset6.attrs[tup[0]] = tup[1]
-
-    # dset6a = fp1.create_dataset('s2rms',data=s2_rms)
-    # for tup in attrs:
-    #     dset6a.attrs[tup[0]] = tup[1]
-
-    # dset7 = fp1.create_dataset('num',data=n_exp)
-    # for tup in attrs:
-    #     dset7.attrs[tup[0]] = tup[1]
-
-    # dset8 = fp1.create_dataset('tvals',data=ystack)
-    # for tup in attrs:
-    #     dset8.attrs[tup[0]] = tup[1]
-
     fp1.close()
-
     end_time = time.time()
+
     print('----------------------------------------------')
     print('End of Program and Time Profile')
     print('----------------------------------------------')
