@@ -1,0 +1,16 @@
+#!/bin/csh
+
+# Use f2py to form the python modules for the Covariant CISD
+
+f2py -c -m BetaDerPT BetaDerPT.f90
+f2py -c -m CovBetaPT CovBetaPT.f90
+f2py -c -m MuDerPT MuDerPT.f90
+f2py -c -m CovMuPT CovMuPT.f90
+f2py -c -m EnAndOvlp EnAndOvlp.f90
+
+
+# Use f2py to form the python modules for the Fixed Ref CISD
+
+f2py -c -m FixEnAndOvlp FixEnAndOvlp.f90
+f2py -c -m FixBetaCISD FixBetaCISD.f90
+f2py -c -m FixMuCISD FixMuCISD.f90
