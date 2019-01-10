@@ -1,8 +1,0 @@
-#!/bin/csh
-
-python3 CISD_Main_Covar.py
-rm ./Output_cisd/*.pdf
-rm ./Output_cisd/*.h5
-mv *_cisd_*.pdf Output_cisd/
-mv *_cisd_*.h5 Output_cisd/
-
