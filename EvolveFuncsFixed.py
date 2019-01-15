@@ -361,6 +361,10 @@ def beta_evolve(Tau, TSamps, U, V, OneH, Eri):
         OneH, Eri, T0, T1, T2, U, V
     )
 
+    dt0_dtau *= -1
+    dt1_dtau *= -1
+    dt2_dtau *= -1
+
     # Reshape the array as vectors and compress to send them out.
     dt1_dtau = np.reshape(dt1_dtau,(Nso)**2)
     dt2_dtau = T2_Compress(dt2_dtau)

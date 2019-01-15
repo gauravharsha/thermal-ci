@@ -26,7 +26,7 @@ len_t2 = 0
 #
 
 
-def ParseInput(enuc=False,eccsd=False):
+def ParseInput(enuc=False):
     fin = open('Input')
     line = fin.readline()
 
@@ -65,14 +65,16 @@ def ParseInput(enuc=False,eccsd=False):
 
     line = fin.readline()
     pos = line.find(':') + 1
-    global E_CCSD
-    E_CCSD = float(line[pos:].strip())
+    global cis_bool
+    cis_bool = bool(int(line[pos:].strip()))
+
+    line = fin.readline()
+    pos = line.find(':') + 1
+    global cisd_bool
+    cisd_bool = bool(int(line[pos:].strip()))
 
     if enuc:
-        if eccsd:
-            return fname, n_elec, beta_f, beta_pts, E_NUC, E_CCSD
-        else:
-            return fname, n_elec, beta_f, beta_pts, E_NUC
+        return fname, n_elec, beta_f, beta_pts, E_NUC
     else:
         return fname, n_elec, beta_f, beta_pts
 
@@ -419,7 +421,9 @@ def main():
 
     # initial condition for Tamps at beta = 0 = mu
     y0_cis = np.concatenate(([t0], t1_vec, t2_vec))
+    yf_cis = np.concatenate(([t0], t1_vec, t2_vec))
     y0_cisd = np.concatenate(([t0], t1_vec, t2_vec))
+    yf_cisd = np.concatenate(([t0], t1_vec, t2_vec))
 
     # Data to be output at BETA GRID POINT
     e_cis = np.zeros(n_data)
@@ -467,7 +471,7 @@ def main():
     #   where it went wrong.                                        #
     #################################################################
 
-    fout = fn[0:-7] + 'thermal_cisd_out.h5'
+    fout = fn[0:-7] + 'thermal_cisd_cov.h5'
     print('Writing output to {}'.format(fout))
 
     fp1 = h5py.File(fout,'w')
@@ -493,11 +497,12 @@ def main():
     #   evolve in the Mu Direction to fix the Number of Particles   #
     #################################################################
 
-    beta_solver_cis = ode(beta_cis).set_integrator('vode',method='bdf',rtol=deqtol)
-    beta_solver_cisd = ode(beta_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
-
-    mu_solver_cis = ode(mu_cis).set_integrator('vode',method='bdf',rtol=deqtol)
-    mu_solver_cisd = ode(mu_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
+    if cis_bool:
+        beta_solver_cis = ode(beta_cis).set_integrator('vode',method='bdf',rtol=deqtol)
+        mu_solver_cis = ode(mu_cis).set_integrator('vode',method='bdf',rtol=deqtol)
+    if cisd_bool:
+        beta_solver_cisd = ode(beta_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
+        mu_solver_cisd = ode(mu_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
 
     j = 1
 
@@ -517,14 +522,17 @@ def main():
         # 2: Beta evolution 
         ############################### 
 
-        print('\t\t\t Beta-Evolution for CI-Singles')
-        yf_cis = ci_beta_integrate(
-            beta_solver_cis, b_span, y0_cis, alpha, h1, eri
-        )
-        print('\t\t\t Beta-Evolution for CI-Singles and Doubles')
-        yf_cisd = ci_beta_integrate(
-            beta_solver_cisd, b_span, y0_cisd, alpha, h1, eri
-        )
+        if cis_bool:
+            print('\t\t\t Beta-Evolution for CI-Singles')
+            yf_cis = ci_beta_integrate(
+                beta_solver_cis, b_span, y0_cis, alpha, h1, eri
+            )
+
+        if cisd_bool:
+            print('\t\t\t Beta-Evolution for CI-Singles and Doubles')
+            yf_cisd = ci_beta_integrate(
+                beta_solver_cisd, b_span, y0_cisd, alpha, h1, eri
+            )
 
         y0_cis = yf_cis
         y0_cisd = yf_cisd
@@ -535,15 +543,17 @@ def main():
         # 3: Mu or ChemPot evolution 
         ############################### 
 
-        print('\t\t\t Mu-Evolution for CI-Singles')
-        yf_cis, chem_cis = mu_find_and_integrate(
-            mu_solver_cis, chem_cis, y0_cis, n_elec, b_span[1], alpha, h1
-        )
+        if cis_bool:
+            print('\t\t\t Mu-Evolution for CI-Singles')
+            yf_cis, chem_cis = mu_find_and_integrate(
+                mu_solver_cis, chem_cis, y0_cis, n_elec, b_span[1], alpha, h1
+            )
 
-        print('\t\t\t Mu-Evolution for CI-Singles and Doubles')
-        yf_cisd, chem_cisd = mu_find_and_integrate(
-            mu_solver_cisd, chem_cisd, y0_cisd, n_elec, b_span[1], alpha, h1
-        )
+        if cisd_bool:
+            print('\t\t\t Mu-Evolution for CI-Singles and Doubles')
+            yf_cisd, chem_cisd = mu_find_and_integrate(
+                mu_solver_cisd, chem_cisd, y0_cisd, n_elec, b_span[1], alpha, h1
+            )
 
         ###############################################
         # 4: Update H5 and set up for the next loop

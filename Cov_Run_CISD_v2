@@ -1,0 +1,8 @@
+#!/bin/csh
+
+python3 CISD_Main_Covar_v2.py
+rm ./Output_cisd_cov/*.pdf
+rm ./Output_cisd_cov/*.h5
+mv *_cisd_*.pdf Output_cisd_cov/
+mv *_cisd_*.h5 Output_cisd_cov/
+

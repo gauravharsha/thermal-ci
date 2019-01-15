@@ -16,7 +16,7 @@ from EvolveFuncsFixed import *
 # GLOBAL VARIABLES
 #
 
-mu_step_0 = +1e-0
+mu_step_0 = +5e-2
 len_t1 = 0
 len_t2 = 0
 
@@ -26,7 +26,7 @@ len_t2 = 0
 #
 
 
-def ParseInput(enuc=False,eccsd=False):
+def ParseInput(enuc=False):
     fin = open('Input')
     line = fin.readline()
 
@@ -65,14 +65,16 @@ def ParseInput(enuc=False,eccsd=False):
 
     line = fin.readline()
     pos = line.find(':') + 1
-    global E_CCSD
-    E_CCSD = float(line[pos:].strip())
+    global cis_bool
+    cis_bool = bool(int(line[pos:].strip()))
+
+    line = fin.readline()
+    pos = line.find(':') + 1
+    global cisd_bool
+    cisd_bool = bool(int(line[pos:].strip()))
 
     if enuc:
-        if eccsd:
-            return fname, n_elec, beta_f, beta_pts, E_NUC, E_CCSD
-        else:
-            return fname, n_elec, beta_f, beta_pts, E_NUC
+        return fname, n_elec, beta_f, beta_pts, E_NUC
     else:
         return fname, n_elec, beta_f, beta_pts
 
@@ -248,7 +250,7 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, x, y, h1):
 
             # Evaluate the Number Expectation
             num, ov = fixenandovlp(
-                h1*0+1, t2*0, t0, t1, t2, x, y
+                np.ones(nso), t2*0, t0, t1, t2, x, y
             )
 
             num /= ov
@@ -394,6 +396,7 @@ def main():
     en, ov = fixenandovlp(
         h1, eri, t0, t1, t2, x, y 
     )
+    en /= ov
 
     # Beta Grid
     beta_0 = 0
@@ -402,7 +405,7 @@ def main():
 
     # Alpha Grid
     mu_0 = np.log(alpha)
-    mu_step_0 = +1e-1
+    mu_step_0 = -1e-2
     mu_f = mu_step_0
 
     n_data = 1
@@ -449,7 +452,7 @@ def main():
 
     # Print the first things
     num, ov = fixenandovlp(
-        h1*0+1, eri*0, t0, t1, t2, x, y
+        np.ones(nso), eri*0, t0, t1, t2, x, y
     )
     num /= ov
 
