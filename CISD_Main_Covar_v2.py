@@ -265,9 +265,11 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, alpha, h1):
                 if val<1e-1:
                     sp_count += 1
                 else:
+                    mu_step_0 *= -1
                     mu_step *= -1
                 
                 if sp_count >= 10:
+                    mu_step_0 *= -1
                     mu_step *= -1
                     sp_count = 0
 

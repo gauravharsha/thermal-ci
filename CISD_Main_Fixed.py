@@ -262,9 +262,11 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, x, y, h1):
                     sp_count += 1
                 else:
                     mu_step *= -1
+                    mu_step_0 *= -1
                 
                 if sp_count >= 10:
                     mu_step *= -1
+                    mu_step_0 *= -1
                     sp_count = 0
 
             ndiff_mag = np.abs(num - nelec)
@@ -418,7 +420,9 @@ def main():
 
     # initial condition for Tamps at beta = 0 = mu
     y0_cis = np.concatenate(([t0], t1_vec, t2_vec))
+    yf_cis = np.concatenate(([t0], t1_vec, t2_vec))
     y0_cisd = np.concatenate(([t0], t1_vec, t2_vec))
+    yf_cisd = np.concatenate(([t0], t1_vec, t2_vec))
 
     # Data to be output at BETA GRID POINT
     e_cis = np.zeros(n_data)
@@ -471,7 +475,7 @@ def main():
 
     fp1 = h5py.File(fout,'w')
 
-    dsets = ['beta','e_cis', 'e_cisd','mu_cis','mu_cisd','t0cis','t1icis','t2cis',\
+    dsets = ['beta','e_cis', 'e_cisd','mu_cis','mu_cisd','t0cis','t1cis','t2cis',\
         't0cisd','t1cisd','t2cisd']
 
     # Create all but the ystack data sets
@@ -509,14 +513,17 @@ def main():
         # 1: Beta evolution 
         ############################### 
 
-        print('\t\t\t Beta-Evolution for CI-Singles')
-        yf_cis = ci_beta_integrate(
-            beta_solver_cis, b_span, y0_cis, x, y, h1, eri
-        )
-        print('\t\t\t Beta-Evolution for CI-Singles and Doubles')
-        yf_cisd = ci_beta_integrate(
-            beta_solver_cisd, b_span, y0_cisd, x, y, h1, eri
-        )
+        if cis_bool:
+            print('\t\t\t Beta-Evolution for CI-Singles')
+            yf_cis = ci_beta_integrate(
+                beta_solver_cis, b_span, y0_cis, x, y, h1, eri
+            )
+
+        if cisd_bool:
+            print('\t\t\t Beta-Evolution for CI-Singles and Doubles')
+            yf_cisd = ci_beta_integrate(
+                beta_solver_cisd, b_span, y0_cisd, x, y, h1, eri
+            )
 
         y0_cis = yf_cis
         y0_cisd = yf_cisd
@@ -527,15 +534,17 @@ def main():
         # 2: Mu or ChemPot evolution 
         ############################### 
 
-        print('\t\t\t Mu-Evolution for CI-Singles')
-        yf_cis, chem_cis = mu_find_and_integrate(
-            mu_solver_cis, chem_cis, y0_cis, n_elec, b_span[1], x, y, h1
-        )
+        if cis_bool:
+            print('\t\t\t Mu-Evolution for CI-Singles')
+            yf_cis, chem_cis = mu_find_and_integrate(
+                mu_solver_cis, chem_cis, y0_cis, n_elec, b_span[1], x, y, h1
+            )
 
-        print('\t\t\t Mu-Evolution for CI-Singles and Doubles')
-        yf_cisd, chem_cisd = mu_find_and_integrate(
-            mu_solver_cisd, chem_cisd, y0_cisd, n_elec, b_span[1], x, y, h1
-        )
+        if cisd_bool:
+            print('\t\t\t Mu-Evolution for CI-Singles and Doubles')
+            yf_cisd, chem_cisd = mu_find_and_integrate(
+                mu_solver_cisd, chem_cisd, y0_cisd, n_elec, b_span[1], x, y, h1
+            )
 
         ###############################################
         # 3: Update H5 and set up for the next loop
