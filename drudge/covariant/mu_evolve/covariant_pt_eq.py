@@ -138,7 +138,7 @@ Tvec = dr2.simplify(t0 + T1 + T2)
 #########################################################################
 
 # First order theory
-mp_rhs_op = dr2.simplify( (ham_th * Tvec ) / 2 )
+mp_rhs_op = dr2.simplify( (ham_th | Tvec ) / 2 )
 
 print('\n\n--------------------------------------------------------------------------------')
 print('RHS operator terms evaluated')
@@ -171,8 +171,7 @@ print('Equations obtained')
 # t2dag_t = dr2.simplify( proj_t2 * ( Tvec ) )
 # 
 # s1dag_s = dr2.simplify( proj_s1 * ( Svec ) )
-# s2dag_s = dr2.simplify( proj_s2 * ( Svec ) )
-# s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
+# s2dag_s = dr2.simplify( proj_s2 * ( Svec ) ) # s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
 # s4dag_s = dr2.simplify( proj_s4 * ( Svec ) )
 # 
 # t1_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t1dag_t ) )

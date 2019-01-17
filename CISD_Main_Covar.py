@@ -26,7 +26,7 @@ len_t2 = 0
 #
 
 
-def ParseInput(enuc=False,eccsd=False):
+def ParseInput(enuc=False):
     fin = open('Input')
     line = fin.readline()
 
@@ -65,14 +65,16 @@ def ParseInput(enuc=False,eccsd=False):
 
     line = fin.readline()
     pos = line.find(':') + 1
-    global E_CCSD
-    E_CCSD = float(line[pos:].strip())
+    global cis_bool
+    cis_bool = bool(int(line[pos:].strip()))
+
+    line = fin.readline()
+    pos = line.find(':') + 1
+    global cisd_bool
+    cisd_bool = bool(int(line[pos:].strip()))
 
     if enuc:
-        if eccsd:
-            return fname, n_elec, beta_f, beta_pts, E_NUC, E_CCSD
-        else:
-            return fname, n_elec, beta_f, beta_pts, E_NUC
+        return fname, n_elec, beta_f, beta_pts, E_NUC
     else:
         return fname, n_elec, beta_f, beta_pts
 
@@ -131,7 +133,7 @@ def updateh5(dsets, vals, i_at):
 #
 
 
-def ci_beta_integrate(integrator, bspan, y_in, alpha, h1, eri):
+def ci_beta_integrate(integrator, bspan, y_in, mu_val, alpha, h1, eri):
     """
     Function to perform the task of integrating the BETA evolution equations for zeroth, first
     and second order.
@@ -159,7 +161,7 @@ def ci_beta_integrate(integrator, bspan, y_in, alpha, h1, eri):
         raise ValueError('Inappropriate length of the input array ',bspan)
 
     # Set the initial conditions
-    integrator.set_initial_value(y_in, bspan[0]).set_f_params(alpha, h1, eri)
+    integrator.set_initial_value(y_in, bspan[0]).set_f_params(mu_val, alpha, h1, eri)
     fin_ci = integrator.integrate(bspan[1])
 
     return fin_ci
@@ -183,8 +185,8 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, alpha, h1):
     nso = len(h1)
 
     # HFB coefficients
-    x = 1/np.sqrt( 1 + np.exp( -beta*h1 )*alpha )
-    y = np.exp( - beta * h1 / 2 ) * x * np.sqrt( alpha )
+    x = 1/np.sqrt( 1 + np.exp( -beta*h1 + mu_in )*alpha )
+    y = np.exp( -( beta * h1 - mu_in )/ 2 ) * x * np.sqrt( alpha )
 
     # find the initial expectation value, i.e. <N>
     t0 = y_in[0]
@@ -245,6 +247,10 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, alpha, h1):
             # Evolve to the mu_f
             yf2 = integrator.integrate(mu_span[1])
 
+            # HFB coefficients
+            x = 1/np.sqrt( 1 + np.exp( -beta*h1 + mu_span[1] )*alpha )
+            y = np.exp( -( beta * h1 - mu_span[1] )/ 2 ) * x * np.sqrt( alpha )
+
             # Extract the amplitudes
             t0 = yf2[0]
             t1 = np.reshape(yf2[1:1+nso**2],(nso,nso))
@@ -263,9 +269,11 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, alpha, h1):
                 if val<1e-1:
                     sp_count += 1
                 else:
+                    mu_step_0 *= -1
                     mu_step *= -1
                 
                 if sp_count >= 10:
+                    mu_step_0 *= -1
                     mu_step *= -1
                     sp_count = 0
 
@@ -299,6 +307,10 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, alpha, h1):
             # Evolve the ODE to mid point of the bracket
             mu_mid = np.mean(mu_bisect)
             yf_mid = integrator.integrate(mu_mid)
+
+            # HFB coefficients
+            x = 1/np.sqrt( 1 + np.exp( -beta*h1 + mu_mid )*alpha )
+            y = np.exp( -( beta * h1 - mu_mid )/ 2 ) * x * np.sqrt( alpha )
 
             # Extract the amplitudes
             t0 = yf_mid[0]
@@ -419,7 +431,9 @@ def main():
 
     # initial condition for Tamps at beta = 0 = mu
     y0_cis = np.concatenate(([t0], t1_vec, t2_vec))
+    yf_cis = np.concatenate(([t0], t1_vec, t2_vec))
     y0_cisd = np.concatenate(([t0], t1_vec, t2_vec))
+    yf_cisd = np.concatenate(([t0], t1_vec, t2_vec))
 
     # Data to be output at BETA GRID POINT
     e_cis = np.zeros(n_data)
@@ -467,7 +481,7 @@ def main():
     #   where it went wrong.                                        #
     #################################################################
 
-    fout = fn[0:-7] + 'thermal_cisd_out.h5'
+    fout = fn[0:-7] + 'thermal_cisd_cov.h5'
     print('Writing output to {}'.format(fout))
 
     fp1 = h5py.File(fout,'w')
@@ -493,11 +507,12 @@ def main():
     #   evolve in the Mu Direction to fix the Number of Particles   #
     #################################################################
 
-    beta_solver_cis = ode(beta_cis).set_integrator('vode',method='bdf',rtol=deqtol)
-    beta_solver_cisd = ode(beta_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
-
-    mu_solver_cis = ode(mu_cis).set_integrator('vode',method='bdf',rtol=deqtol)
-    mu_solver_cisd = ode(mu_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
+    if cis_bool:
+        beta_solver_cis = ode(beta_cis).set_integrator('vode',method='bdf',rtol=deqtol)
+        mu_solver_cis = ode(mu_cis).set_integrator('vode',method='bdf',rtol=deqtol)
+    if cisd_bool:
+        beta_solver_cisd = ode(beta_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
+        mu_solver_cisd = ode(mu_evolve).set_integrator('vode',method='bdf',rtol=deqtol)
 
     j = 1
 
@@ -507,24 +522,20 @@ def main():
         b_span = [beta_grid[j-1], beta_2]
 
         ############################### 
-        # 1: Update the HFB coefficients
+        # 1: Beta evolution 
         ############################### 
 
-        x = 1/np.sqrt(1 + np.exp( -b_span[0]*h1 )*alpha )
-        y = np.exp( ( -b_span[0]*h1 )/2 )*x*np.sqrt(alpha)
+        if cis_bool:
+            print('\t\t\t Beta-Evolution for CI-Singles')
+            yf_cis = ci_beta_integrate(
+                beta_solver_cis, b_span, y0_cis, chem_cis, alpha, h1, eri
+            )
 
-        ############################### 
-        # 2: Beta evolution 
-        ############################### 
-
-        print('\t\t\t Beta-Evolution for CI-Singles')
-        yf_cis = ci_beta_integrate(
-            beta_solver_cis, b_span, y0_cis, alpha, h1, eri
-        )
-        print('\t\t\t Beta-Evolution for CI-Singles and Doubles')
-        yf_cisd = ci_beta_integrate(
-            beta_solver_cisd, b_span, y0_cisd, alpha, h1, eri
-        )
+        if cisd_bool:
+            print('\t\t\t Beta-Evolution for CI-Singles and Doubles')
+            yf_cisd = ci_beta_integrate(
+                beta_solver_cisd, b_span, y0_cisd, chem_cisd, alpha, h1, eri
+            )
 
         y0_cis = yf_cis
         y0_cisd = yf_cisd
@@ -532,18 +543,20 @@ def main():
         print('\n\t\t\tNew Beta = {}'.format(beta_2))
 
         ############################### 
-        # 3: Mu or ChemPot evolution 
+        # 2: Mu or ChemPot evolution 
         ############################### 
 
-        print('\t\t\t Mu-Evolution for CI-Singles')
-        yf_cis, chem_cis = mu_find_and_integrate(
-            mu_solver_cis, chem_cis, y0_cis, n_elec, b_span[1], alpha, h1
-        )
+        if cis_bool:
+            print('\t\t\t Mu-Evolution for CI-Singles')
+            yf_cis, chem_cis = mu_find_and_integrate(
+                mu_solver_cis, chem_cis, y0_cis, n_elec, b_span[1], alpha, h1
+            )
 
-        print('\t\t\t Mu-Evolution for CI-Singles and Doubles')
-        yf_cisd, chem_cisd = mu_find_and_integrate(
-            mu_solver_cisd, chem_cisd, y0_cisd, n_elec, b_span[1], alpha, h1
-        )
+        if cisd_bool:
+            print('\t\t\t Mu-Evolution for CI-Singles and Doubles')
+            yf_cisd, chem_cisd = mu_find_and_integrate(
+                mu_solver_cisd, chem_cisd, y0_cisd, n_elec, b_span[1], alpha, h1
+            )
 
         ###############################################
         # 4: Update H5 and set up for the next loop
@@ -556,9 +569,9 @@ def main():
         # Computing the quantities of interest
         beta_grid = np.append(beta_grid,b_span[1])
 
-        # Update the HFB Coefficients
-        x = 1/np.sqrt(1 + np.exp( -b_span[1]*h1 )*alpha )
-        y = np.exp( ( -b_span[1]*h1 )/2 )*x*np.sqrt(alpha)
+        # Update the HFB Coefficients for CIS
+        x = 1/np.sqrt(1 + np.exp( -b_span[1]*h1 + chem_cis )*alpha )
+        y = np.exp( ( -b_span[1]*h1 + chem_cis )/2 )*x*np.sqrt(alpha)
 
         # for cis
         t0 = y0_cis[0]
@@ -574,6 +587,10 @@ def main():
         t0_cis = np.append( t0_cis, t0 )
         t1_cis = np.append( t1_cis, np.sqrt( np.mean( t1**2 ) ) )
         t2_cis = np.append( t2_cis, np.sqrt( np.mean( t2**2 ) ) )
+
+        # Update the HFB Coefficients for CISD
+        x = 1/np.sqrt(1 + np.exp( -b_span[1]*h1 + chem_cisd )*alpha )
+        y = np.exp( ( -b_span[1]*h1 + chem_cisd )/2 )*x*np.sqrt(alpha)
 
         # for cisd
         t0 = y0_cisd[0]

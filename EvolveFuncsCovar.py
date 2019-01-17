@@ -309,8 +309,8 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     Nso = np.size(OneH,axis=0)
 
     # Computing the HFB parameters
-    U = 1/np.sqrt( 1 + np.exp(-Tau*OneH)*Alpha )
-    V = np.exp( (-Tau*OneH)/2)*U*np.sqrt(Alpha)
+    U = 1/np.sqrt( 1 + np.exp(-Tau*OneH + Mu)*Alpha )
+    V = np.exp( (-Tau*OneH + Mu)/2)*U*np.sqrt(Alpha)
 
     # lengths of different t and s tensors
     lent1 = int( comb(Nso,1)**2 )
@@ -322,7 +322,7 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     T2 = T2_Decompress(TSamps[1+lent1:],Nso)
     
     dt0_dmu, dt1_dmu, dt2_dmu = covmupt(
-        T0, T1, T2, U, V
+        T1, T2, U, V
     )
     
     #####################################################
@@ -335,21 +335,11 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     #                                                   #
     #####################################################
 
-    # NOTE: The alpha / mu derivatives do not count here because the reference
-    #       does not depend, in any way, on the chemical potential / alpha, and
-    #       therefore, neither does the HFB transformation
+    # First two arguments are beta
+    t0der, t1der = muderpt(1.0, T1, T2, U, V)
 
-    # NOTE: The sequnce of code below is INCORRECT ANYWAY
-
-    # t0der, t1der, s0der, s1der, s2der, s3der = MuDerMP(1, T1, T2, S1, S2, S3, S4, U, V)
-
-    # dt0_dmu -= t0der
-    # dt1_dmu -= t1der 
-
-    # ds0_dmu -= s0der
-    # ds1_dmu -= s1der 
-    # ds2_dmu -= s2der
-    # ds3_dmu -= s3der 
+    dt0_dmu -= t0der
+    dt1_dmu -= t1der
 
     # Reshape the array as vectors and compress to send them out.
     dt1_dmu = np.reshape(dt1_dmu,(Nso)**2)
@@ -358,7 +348,7 @@ def mu_evolve(Mu, TSamps, Tau, Alpha, OneH):
     out = np.concatenate( ([dt0_dmu], dt1_dmu, dt2_dmu) )
     return out
 
-def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
+def beta_evolve(Tau, TSamps, Mu, Alpha, OneH, Eri):
     """
     Function that returns the RHS of the Differential equation set up
     Inputs:     
@@ -385,8 +375,8 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
     Nso = np.size(Eri,axis=0)
 
     # Computing the HFB parameters
-    U = 1/np.sqrt( 1 + np.exp(-Tau*OneH)*Alpha )
-    V = np.exp( (-Tau*OneH)/2)*U*np.sqrt(Alpha)
+    U = 1/np.sqrt( 1 + np.exp(-Tau*OneH + Mu)*Alpha )
+    V = np.exp( (-Tau*OneH + Mu)/2)*U*np.sqrt(Alpha)
 
     # lengths of different t and s tensors
     lent1 = int( comb(Nso,1)**2 )
@@ -428,14 +418,14 @@ def beta_evolve(Tau, TSamps, Alpha, OneH, Eri):
 # WRAPPER FUNCTIONS
 # 
 
-def beta_cis(Tau, Tamps, Alpha, OneH, Eri):
+def beta_cis(Tau, Tamps, Mu, Alpha, OneH, Eri):
     """
     Wrapper function that returns the RHS for the CIS Theory approximation to the 
     Imaginary time Schrodinger equation set up
 
     """
     nso = len(OneH)
-    yout = beta_evolve(Tau, Tamps, Alpha, OneH, Eri)
+    yout = beta_evolve(Tau, Tamps, Mu, Alpha, OneH, Eri)
 
     y_cis = yout*0
     y_cis[0] = yout[0]

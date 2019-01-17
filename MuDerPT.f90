@@ -1,7 +1,8 @@
-      Subroutine MuDerPT(Beta,T1,T2,NA,X,Y,TM0,TM1)
+      Subroutine BetaDerPT(Beta,T1,T2,NA,X,Y,TM0,TM1)
           Implicit None
           Integer, Intent(In) :: NA
-          Real (Kind=8), Intent(In) :: Beta, X(NA), Y(NA)
+          Real (Kind=8), Intent(In) :: X(NA), Y(NA)
+          Real (Kind=8), Intent(In) :: Beta
           Real (Kind=8), Intent(In) :: T1(NA,NA), T2(NA,NA,NA,NA)
           Real (Kind=8), Intent(Out) :: TM0
           Real (Kind=8), Intent(Out) :: TM1(NA,NA)
@@ -49,4 +50,4 @@
 
           !$omp end parallel
 
-      End Subroutine MuDerPT
+      End Subroutine BetaDerPT
