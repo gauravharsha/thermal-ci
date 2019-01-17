@@ -1,21 +1,22 @@
 """
-    Date: Dec 2, 2018
-    Modified: Dec 27, 2018
+    Date: Jan 6, 2018
+    Modified: Jan 6, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
-    This is covariant version - i.e. the reference keeps evolving
+    This is fixed reference version - i.e. the reference keeps evolving
 
     Here, we expand the wavefunction as a CI-like series expansion and 
     then form the working equations (following Griffiths)
 """
 
-# from pyspark import SparkContext
-from dummy_spark import SparkContext
+from pyspark import SparkContext
+# from dummy_spark import SparkContext
 from drudge import *
 from ThermofieldDrudge import *
 # from sympy import Symbol, symbols, IndexedBase, sqrt, init_printing, KroneckerDelta
 from sympy import *
 from gristmill import *
 import time
+import pdb
 
 delK = KroneckerDelta
 
@@ -45,11 +46,16 @@ c_dag = nam2.c_dag
 a, b, c, d, i, j, k, l, p, q, r, s = nam2.a, nam2.b, nam2.c, nam2.d, nam2.i, nam2.j, nam2.k, nam2.l, nam2.p, nam2.q, nam2.r, nam2.s
 
 # Full Hamiltonian
+full_ham1 = dr.simplify(dr.ham)
+
+e0 = IndexedBase('e0')
 ham1 = dr.einst(
-    d_dag[p]*d_[p]
+    e0[p]*d_dag[p]*d_[p]
 )
 
-full_ham = dr.simplify(ham1)
+ham2 = full_ham1.filter(lambda x: len(x.vecs)>2)
+
+full_ham = dr.simplify(ham1 + ham2)
 
 # Orig Hamiltonian Construct Time
 ham_time = time.time()
@@ -75,6 +81,16 @@ tfd_defs = [
     ddag_def
 ]
 
+ham_th1 = Tensor(
+    dr2,
+    ham1.subst_all(tfd_defs).terms
+)
+
+ham_th2 = Tensor(
+    dr2,
+    ham2.subst_all(tfd_defs).terms
+)
+
 ham_th = Tensor(
     dr2,
     full_ham.subst_all(tfd_defs).terms
@@ -98,6 +114,8 @@ print('\nThermal Hamiltonian has {} 3 or more body terms'.format(
     ham_th_2body.n_terms
     )
 )
+
+en_rhf = dr2.simplify(dr2.eval_phys_vev( ham_th ))
 
 # Thermal Hamiltonian Time
 hamth_time = time.time()
@@ -129,16 +147,10 @@ Tvec = dr2.simplify(t0 + T1 + T2)
 
 #########################################################################
 ##      Perturbation Theory equation looks like                        ##
-##      TODO: THE FOLLOWING TWO EQNS ARE WRONG HERE                    ##
-##      ( d/dMu - 0.5 * Beta * N ) | 1 > = 0                           ##
-##      ( d/dMu - 0.5 * Beta * N ) | 2 > = 0                           ##
-##                                                                     ##
-##      So here, we will generate the RHS components                   ##
-##      The ``0.5 * Beta'' factor will be taken care of in odesolve    ##
 #########################################################################
 
 # First order theory
-mp_rhs_op = dr2.simplify( (ham_th | Tvec ) / 2 )
+mp_rhs_op = dr2.simplify( ham_th * Tvec )
 
 print('\n\n--------------------------------------------------------------------------------')
 print('RHS operator terms evaluated')
@@ -156,8 +168,8 @@ proj_t2 = (
     c_[a,DOWN] * c_[b,DOWN] * c_[q,UP] * c_[p,UP]
 )
 
-rt1_th = dr2.memoize(lambda: dr2.simplify(proj_t1 * (mp_rhs_op)),'RTpa.pickle')
-rt2_th = dr2.memoize(lambda: dr2.simplify(proj_t2 * (mp_rhs_op)),'RTpqab.pickle')
+rt1_th = dr2.memoize( lambda: dr2.simplify(proj_t1 * (mp_rhs_op)),'RTpa.pickle')
+rt2_th = dr2.memoize( lambda: dr2.simplify(proj_t2 * (mp_rhs_op)),'RTpqab.pickle')
 
 # Derive the working equations by projection
 rt_0body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( mp_rhs_op ) ), 'rt0_eqn.pickle' )
@@ -165,22 +177,6 @@ rt_1body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( r
 rt_2body = dr2.memoize( lambda: dr2.simplify( dr2.eval_phys_vev( dr2.simplify( rt2_th ))), 'rt2_eqn.pickle')
 
 print('Equations obtained')
-
-# Confirming that the contractions are unity
-# t1dag_t = dr2.simplify( proj_t1 * ( Tvec ) )
-# t2dag_t = dr2.simplify( proj_t2 * ( Tvec ) )
-# 
-# s1dag_s = dr2.simplify( proj_s1 * ( Svec ) )
-# s2dag_s = dr2.simplify( proj_s2 * ( Svec ) ) # s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
-# s4dag_s = dr2.simplify( proj_s4 * ( Svec ) )
-# 
-# t1_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t1dag_t ) )
-# t2_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t2dag_t ) )
-# 
-# s1_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s1dag_s ) )
-# s2_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s2dag_s ) )
-# s3_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s1dag_s ) )
-# s4_dag_s_exp = dr2.simplify( dr2.eval_phys_vev( s4dag_s ) )
 
 # T2 equation time
 t2eqn_time = time.time()
@@ -225,38 +221,41 @@ init_printing()
 print(orig_cost)
 
 # Optimizing
-eval_seq = optimize(
-    work_eqn,
-    interm_fmt = 'tau{}'
-)
-# eval_seq = work_eqn
+try:
+    eval_seq = optimize(
+        work_eqn,
+        interm_fmt = 'tau{}'
+    )
+except ValueError:
+    eval_seq = work_eqn
 
 print(len(eval_seq))
 opt_cost = get_flop_cost(eval_seq, leading=True)
 print(opt_cost)
- 
+
 # Code Generation
+
+# 1: Fortran
 fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
 code = fort_print.doprint(eval_seq, separate_decls=False)
- 
-with open('new_fort.f90','w') as fp:
-    print(code, file=fp)
 
-# NOTE: Since there are no 8-index objects involved here, we will use fortran printer
+# 2: Einsum Python
 # ein_print = EinsumPrinter()
 # code = ein_print.doprint(eval_seq, separate_decls=False)
+
+with open('FixBetaPT.f90','w') as fp:
+    print(code, file=fp)
 
 
 
 """-------------------------------------------------------------------------"""
 """                        Testing the Stuff Generated                      """
 """-------------------------------------------------------------------------"""
-with dr.report('number.html','Thermal Perturbation Theory') as rep:
+with dr.report('fix_pt.html','Thermal Perturbation Theory') as rep:
     rep.add('Full Hamiltonian',full_ham)
     rep.add('Thermal Ham',ham_th)
     rep.add('Tvec',Tvec)
     rep.add('The Spin Rep for Tilde and non Tilde',c_[a,UP] + c_[b,DOWN])
-    rep.add('MP1 0 body eqn',rt_0body)
     rep.add('MP1 1 body eqn',rt_1body)
     rep.add('MP1 2 body eqn',rt_2body)
     # rep.add('Tdag1 * T',t1_dag_t_exp)
@@ -264,14 +263,13 @@ with dr.report('number.html','Thermal Perturbation Theory') as rep:
     # rep.add('Sdag1 * S',s1_dag_s_exp)
     # rep.add('Sdag2 * S',s2_dag_s_exp)
     # rep.add('Sdag3 * S',s3_dag_s_exp)
-    # rep.add('Sdag4 * S',s4_dag_s_exp)
-    # rep.add('Symm Check',dr2.simplify(dr2.einst(
-    #     (t2[a,b] + t2[b,a])*c_dag[a,UP]*c_dag[b,UP]
-    #     )))
-    # i = 0
-    # for eq in eval_seq:
-    #     rep.add('Intermediate Eqn {}'.format(i),eq)
-    #     i += 1
+    rep.add('Symm Check',dr2.simplify(dr2.einst(
+        (t2[a,b] + t2[b,a])*c_dag[a,UP]*c_dag[b,UP]
+        )))
+    i = 0
+    for eq in eval_seq:
+        rep.add('Intermediate Eqn {}'.format(i),eq)
+        i += 1
 
 # End_time
 end_time = time.time()

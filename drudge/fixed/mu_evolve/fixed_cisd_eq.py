@@ -1,8 +1,8 @@
 """
-    Date: Dec 2, 2018
-    Modified: Dec 27, 2018
+    Date: Jan 6, 2018
+    Modified: Jan 6, 2018
     Python Script to Carry Out the Algebraic Calculations for Ab-Initial Thermal Perturbation Theory
-    This is covariant version - i.e. the reference keeps evolving
+    This is fixed-reference version - i.e. the reference keeps evolving
 
     Here, we expand the wavefunction as a CI-like series expansion and 
     then form the working equations (following Griffiths)
@@ -138,7 +138,7 @@ Tvec = dr2.simplify(t0 + T1 + T2)
 #########################################################################
 
 # First order theory
-mp_rhs_op = dr2.simplify( (ham_th | Tvec ) / 2 )
+mp_rhs_op = dr2.simplify( (ham_th * Tvec ) )
 
 print('\n\n--------------------------------------------------------------------------------')
 print('RHS operator terms evaluated')
@@ -171,7 +171,8 @@ print('Equations obtained')
 # t2dag_t = dr2.simplify( proj_t2 * ( Tvec ) )
 # 
 # s1dag_s = dr2.simplify( proj_s1 * ( Svec ) )
-# s2dag_s = dr2.simplify( proj_s2 * ( Svec ) ) # s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
+# s2dag_s = dr2.simplify( proj_s2 * ( Svec ) )
+# s3dag_s = dr2.simplify( proj_s3 * ( Svec ) )
 # s4dag_s = dr2.simplify( proj_s4 * ( Svec ) )
 # 
 # t1_dag_t_exp = dr2.simplify( dr2.eval_phys_vev( t1dag_t ) )
@@ -239,7 +240,7 @@ print(opt_cost)
 fort_print = FortranPrinter(default_type='Real (Kind=8)', explicit_bounds=True)
 code = fort_print.doprint(eval_seq, separate_decls=False)
  
-with open('new_fort.f90','w') as fp:
+with open('FixMuPT.f90','w') as fp:
     print(code, file=fp)
 
 # NOTE: Since there are no 8-index objects involved here, we will use fortran printer

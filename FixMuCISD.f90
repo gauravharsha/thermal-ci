@@ -1,4 +1,4 @@
-      Subroutine CovMuPT(T0,T1,T2,NA,X,Y,RT0,RT1,RT2)
+      Subroutine FixMuCISD(T0,T1,T2,NA,X,Y,RT0,RT1,RT2)
           Implicit None
           Integer, Intent(In) :: NA
           Real (Kind=8), Intent(In) :: X(NA), Y(NA)
@@ -10,6 +10,7 @@
 
           Real (Kind=8) :: tau0
           Real (Kind=8), dimension(:, :, :, :), allocatable :: tau1
+          Real (Kind=8), dimension(:, :, :, :), allocatable :: tau2
 
           !$omp parallel default(shared)
 
@@ -41,7 +42,7 @@
           
           
           rt0 = rt0 + ( &
-              t0*tau0 / 2&
+              t0*tau0&
           )
           
           
@@ -61,7 +62,7 @@
               do b=1, na
           
                   rt1(a, b) = rt1(a, b) + ( &
-                      tau0 * t1(a, b) / 2&
+                      tau0 * t1(a, b)&
                   )
           
               end do
@@ -88,7 +89,7 @@
                       do d=1, na
           
                           rt2(a, b, c, d) = rt2(a, b, c, d) + ( &
-                              tau0 * t2(a, b, c, d) / 2&
+                              tau0 * t2(a, b, c, d)&
                           )
           
                       end do
@@ -116,7 +117,7 @@
               do c=1, na
                   do d=1, na
           
-                      tau1(a, a, c, d) = tau1(a, a, c, d) + t1(c, d)
+                      tau1(a, a, c, d) = tau1(a, a, c, d) - t1(c, d)
           
                   end do
               end do
@@ -128,24 +129,8 @@
               do b=1, na
                   do c=1, na
           
-                      tau1(a, b, c, a) = tau1(a, b, c, a) - t1(c, b)
+                      tau1(a, b, c, a) = tau1(a, b, c, a) + t1(c, b)
           
-                  end do
-              end do
-          end do
-          !$omp end do
-
-          !$omp do schedule(static)
-          do a=1, na
-              do b=1, na
-                  do c=1, na
-                      do d=1, na
-          
-                          rt2(a, b, c, d) = rt2(a, b, c, d) - ( &
-                              x(a) * y(a) * tau1(a, d, b, c) / 2&
-                          )
-          
-                      end do
                   end do
               end do
           end do
@@ -158,7 +143,7 @@
                       do d=1, na
           
                           rt2(a, b, c, d) = rt2(a, b, c, d) - ( &
-                              x(b) * y(b) * tau1(b, c, a, d) / 2&
+                              x(a) * y(a) * tau1(a, c, b, d)&
                           )
           
                       end do
@@ -169,11 +154,67 @@
 
           deallocate(tau1)
 
+          allocate(tau2(1:na, 1:na, 1:na, 1:na))
+          !$omp do schedule(static)
+          do a=1, na
+              do b=1, na
+                  do c=1, na
+                      do d=1, na
+                          tau2(a, b, c, d) = 0.0
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+          
+
+          !$omp do schedule(static)
+          do a=1, na
+              do c=1, na
+                  do d=1, na
+          
+                      tau2(a, a, c, d) = tau2(a, a, c, d) + t1(c, d)
+          
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do a=1, na
+              do b=1, na
+                  do c=1, na
+          
+                      tau2(a, b, c, a) = tau2(a, b, c, a) - t1(c, b)
+          
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do a=1, na
+              do b=1, na
+                  do c=1, na
+                      do d=1, na
+          
+                          rt2(a, b, c, d) = rt2(a, b, c, d) - ( &
+                              x(b) * y(b) * tau2(b, c, a, d)&
+                          )
+          
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          deallocate(tau2)
+
           !$omp do schedule(static) reduction(+:rt0)
           
           do a=1, na
               rt0 = rt0 + ( &
-                  x(a) * y(a) * t1(a, a) / 2&
+                  x(a) * y(a) * t1(a, a)&
               )
           end do
           
@@ -184,7 +225,7 @@
               do b=1, na
                   do c=1, na
                       rt1(a, b) = rt1(a, b) - ( &
-                          x(c) * y(c) * t2(c, a, b, c) / 2&
+                          x(c) * y(c) * t2(c, a, b, c)&
                       )
                   end do
               end do
@@ -196,7 +237,7 @@
               do b=1, na
           
                   rt1(a, b) = rt1(a, b) + ( &
-                      x(a)**2 * t1(a, b) / 2&
+                      x(a)**2 * t1(a, b)&
                   )
           
               end do
@@ -208,7 +249,7 @@
               do b=1, na
           
                   rt1(a, b) = rt1(a, b) - ( &
-                      y(b)**2 * t1(a, b) / 2&
+                      y(b)**2 * t1(a, b)&
                   )
           
               end do
@@ -218,7 +259,7 @@
           !$omp do schedule(static)
           do a=1, na
           
-              rt1(a, a) = rt1(a, a) + ( t0 * x(a) * y(a) / 2 )
+              rt1(a, a) = rt1(a, a) + ( x(a) * y(a) )
           
           end do
           !$omp end do
@@ -230,7 +271,7 @@
                       do d=1, na
           
                           rt2(a, b, c, d) = rt2(a, b, c, d) + ( &
-                              x(a)**2 * t2(a, b, c, d) / 2&
+                              x(a)**2 * t2(a, b, c, d)&
                           )
           
                       end do
@@ -246,7 +287,7 @@
                       do d=1, na
           
                           rt2(a, b, c, d) = rt2(a, b, c, d) + ( &
-                              x(b)**2 * t2(a, b, c, d) / 2&
+                              x(b)**2 * t2(a, b, c, d)&
                           )
           
                       end do
@@ -262,7 +303,7 @@
                       do d=1, na
           
                           rt2(a, b, c, d) = rt2(a, b, c, d) - ( &
-                              y(c)**2 * t2(a, b, c, d) / 2&
+                              y(c)**2 * t2(a, b, c, d)&
                           )
           
                       end do
@@ -278,7 +319,7 @@
                       do d=1, na
           
                           rt2(a, b, c, d) = rt2(a, b, c, d) - ( &
-                              y(d)**2 * t2(a, b, c, d) / 2&
+                              y(d)**2 * t2(a, b, c, d)&
                           )
           
                       end do
@@ -289,4 +330,4 @@
 
           !$omp end parallel
 
-      End Subroutine CovMuPT
+      End Subroutine FixMuCISD

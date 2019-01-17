@@ -44,11 +44,11 @@
             <div class="page-header" id="sect-2">
                 <h2>Thermal Ham</h2>
             </div>
-            <p>\[ \sum_{a \in L} x_{a}^{2}    c^{\dagger}_{a, \uparrow} c^{}_{a, \uparrow}  + \sum_{a \in L} x_{a}  y_{a}    c^{}_{a, \downarrow} c^{}_{a, \uparrow}  + \sum_{a \in L} y_{a}^{2}  - \sum_{a \in L} y_{a}^{2}    c^{\dagger}_{a, \downarrow} c^{}_{a, \downarrow}  + \sum_{a \in L} x_{a}  y_{a}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{a, \downarrow} \]</p>
+            <p>\[ \sum_{a \in L} x_{a}  y_{a}    c^{}_{a, \downarrow} c^{}_{a, \uparrow} - \sum_{a \in L} y_{a}^{2}    c^{\dagger}_{a, \downarrow} c^{}_{a, \downarrow}  + \sum_{a \in L} x_{a}  y_{a}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{a, \downarrow}  + \sum_{a \in L} y_{a}^{2}   + \sum_{a \in L} x_{a}^{2}    c^{\dagger}_{a, \uparrow} c^{}_{a, \uparrow} \]</p>
             <div class="page-header" id="sect-3">
                 <h2>Tvec</h2>
             </div>
-            <p>\[ - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow}  + t_{0}   + \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow} \]</p>
+            <p>\[ \sum_{a \in L} \sum_{b \in L} t^{(1)}_{a,b}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \downarrow}  + t_{0}  - \sum_{a \in L} \sum_{b \in L} \sum_{c \in L} \sum_{d \in L}  \frac{1}{4} t^{(2)}_{a,b,c,d}    c^{\dagger}_{a, \uparrow} c^{\dagger}_{b, \uparrow} c^{\dagger}_{c, \downarrow} c^{\dagger}_{d, \downarrow} \]</p>
             <div class="page-header" id="sect-4">
                 <h2>The Spin Rep for Tilde and non Tilde</h2>
             </div>
@@ -56,15 +56,15 @@
             <div class="page-header" id="sect-5">
                 <h2>MP1 0 body eqn</h2>
             </div>
-            <p>\[ \sum_{a \in L} \frac{1}{2} x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
+            <p>\[ \sum_{a \in L} t_{0} y_{a}^{2}   + \sum_{a \in L} x_{a}  y_{a}  t^{(1)}_{a,a}  \]</p>
             <div class="page-header" id="sect-6">
                 <h2>MP1 1 body eqn</h2>
             </div>
-            <p>\[ \frac{1}{2} x_{p}^{2}  t^{(1)}_{p,a}  -  \frac{1}{2} y_{a}^{2}  t^{(1)}_{p,a}  - \sum_{b \in L}  \frac{1}{2} x_{b}  y_{b}  t^{(2)}_{b,p,a,b}  \]</p>
+            <p>\[ x_{p}^{2}  t^{(1)}_{p,a}  - y_{a}^{2}  t^{(1)}_{p,a}   + t_{0} \delta_{a p} x_{a}  y_{a}   + \sum_{b \in L} y_{b}^{2}  t^{(1)}_{p,a}  - \sum_{b \in L} x_{b}  y_{b}  t^{(2)}_{b,p,a,b}  \]</p>
             <div class="page-header" id="sect-7">
                 <h2>MP1 2 body eqn</h2>
             </div>
-            <p>\[ \frac{1}{2} x_{p}^{2}  t^{(2)}_{p,q,a,b}   + \frac{1}{2} x_{q}^{2}  t^{(2)}_{p,q,a,b}  -  \frac{1}{2} y_{a}^{2}  t^{(2)}_{p,q,a,b}  -  \frac{1}{2} y_{b}^{2}  t^{(2)}_{p,q,a,b}  \]</p>
+            <p>\[ \sum_{c \in L} y_{c}^{2}  t^{(2)}_{p,q,a,b}   + x_{p}^{2}  t^{(2)}_{p,q,a,b}   + x_{q}^{2}  t^{(2)}_{p,q,a,b}  - y_{a}^{2}  t^{(2)}_{p,q,a,b}  - y_{b}^{2}  t^{(2)}_{p,q,a,b}   + \delta_{a p} x_{a}  y_{a}  t^{(1)}_{q,b}   + \delta_{b q} x_{b}  y_{b}  t^{(1)}_{p,a}  -  \delta_{a q} x_{a}  y_{a}  t^{(1)}_{p,b}  -  \delta_{b p} x_{b}  y_{b}  t^{(1)}_{q,a}  \]</p>
         </div>
 
         <!-- The navigation -->
