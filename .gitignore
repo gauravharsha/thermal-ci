@@ -2,7 +2,6 @@
 *.pdf
 *.h5
 *.so
-Input*
 /Output_cov/
 /Output_cisd/
 /Output_cisd_fix/

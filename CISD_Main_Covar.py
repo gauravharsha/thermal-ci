@@ -73,6 +73,9 @@ def ParseInput(enuc=False):
     global cisd_bool
     cisd_bool = bool(int(line[pos:].strip()))
 
+    if (cisd_bool or cis_bool):
+        raise ValueError('There is nothing to be done since both CIS and CISD are set to False')
+
     if enuc:
         return fname, n_elec, beta_f, beta_pts, E_NUC
     else:
