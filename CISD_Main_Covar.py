@@ -67,13 +67,15 @@ def ParseInput(enuc=False):
     pos = line.find(':') + 1
     global cis_bool
     cis_bool = bool(int(line[pos:].strip()))
+    print('CI Singles Evolution: ', cis_bool)
 
     line = fin.readline()
     pos = line.find(':') + 1
     global cisd_bool
     cisd_bool = bool(int(line[pos:].strip()))
+    print('CI Singles and Doubles Evolution: ', cisd_bool)
 
-    if (cisd_bool or cis_bool):
+    if not (cisd_bool or cis_bool):
         raise ValueError('There is nothing to be done since both CIS and CISD are set to False')
 
     if enuc:

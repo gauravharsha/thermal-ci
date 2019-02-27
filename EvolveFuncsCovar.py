@@ -360,7 +360,7 @@ def beta_evolve(Tau, TSamps, Mu, Alpha, OneH, Eri):
                             T2      ::  T2 amplitude matrix :: (Nso-choose-2)^2 elements
                             T2      ::  S2 amplitude matrix :: (Nso-choose-2)^2 elements
                 Mu      ::  Chemical potential (as an independent parameter
-                            and not in multiplication with Beta
+                            and not in multiplication with Beta)
                 Alpha   ::  Is the initial chemical potential that is used to set the number
                             Alpha = n_elec / (nso + n_elec)
                             u = 1 / np.sqrt( 1 + Alpha )
