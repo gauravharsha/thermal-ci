@@ -190,7 +190,7 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, x, y, h1):
     t2 = T2_Decompress( y_in[1+(nso**2):], nso )
 
     num, ov = fixenandovlp(
-        np.ones(nso), t2*0, t0, t1, t2, x, y
+        np.ones(nso), t2*0, 1.0, t1, t2, x, y
     )
     num /= ov
 
@@ -250,7 +250,7 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, x, y, h1):
 
             # Evaluate the Number Expectation
             num, ov = fixenandovlp(
-                np.ones(nso), t2*0, t0, t1, t2, x, y
+                np.ones(nso), t2*0, 1.0, t1, t2, x, y
             )
 
             num /= ov
@@ -307,7 +307,7 @@ def mu_find_and_integrate(integrator, mu_in, y_in, nelec, beta, x, y, h1):
 
             # Compute the number and update the bracket
             num, ov = fixenandovlp(
-                h1*0+1, t2*0, t0, t1, t2, x, y
+                h1*0+1, t2*0, 1.0, t1, t2, x, y
             )
 
             num /= ov
@@ -396,7 +396,7 @@ def main():
 
     # Hartree Fock Energy at BETA = 0
     en, ov = fixenandovlp(
-        h1, eri, t0, t1, t2, x, y 
+        h1, eri, 1.0, t1, t2, x, y 
     )
     en /= ov
 
@@ -456,7 +456,7 @@ def main():
 
     # Print the first things
     num, ov = fixenandovlp(
-        np.ones(nso), eri*0, t0, t1, t2, x, y
+        np.ones(nso), eri*0, 1.0, t1, t2, x, y
     )
     num /= ov
 
@@ -470,7 +470,7 @@ def main():
     #   where it went wrong.                                        #
     #################################################################
 
-    fout = fn[0:-7] + 'thermal_cisd_out.h5'
+    fout = fn[0:-7] + 'thermal_cisd_fix.h5'
     print('Writing output to {}'.format(fout))
 
     fp1 = h5py.File(fout,'w')
@@ -563,7 +563,7 @@ def main():
         t2 = T2_Decompress( y0_cis[1+nso**2:], nso)
 
         en, ov = fixenandovlp(
-            h1, eri, t0, t1, t2, x, y
+            h1, eri, 1.0, t1, t2, x, y
         )
         en /= ov
 
@@ -578,7 +578,7 @@ def main():
         t2 = T2_Decompress( y0_cisd[1+nso**2:], nso)
 
         en, ov = fixenandovlp(
-            h1, eri, t0, t1, t2, x, y
+            h1, eri, 1.0, t1, t2, x, y
         )
         en /= ov
 

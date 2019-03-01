@@ -21,8 +21,6 @@ def T2_Decompress(T2_Compressed,NSO):
     which is done by this function
     """
     if np.size(T2_Compressed) != int(comb(NSO,2)**2):
-        # XXX: 
-        # pdb.set_trace()
         raise(ValueError,'Invalid Size of the compressed array T2_Compressed')
 
     t2 = np.zeros((NSO,NSO,NSO,NSO))
@@ -314,8 +312,11 @@ def mu_evolve(Mu, TSamps, Tau, U, V, OneH):
     T2 = T2_Decompress(TSamps[1+lent1:],Nso)
     
     dt0_dmu, dt1_dmu, dt2_dmu = fixmucisd(
-        T0, T1, T2, U, V
+        1.0, T1, T2, U, V
     )
+
+    dt1_dmu -= dt0_dmu*T1
+    dt2_dmu -= dt0_dmu*T2
     
     # Reshape the array as vectors and compress to send them out.
     dt1_dmu = np.reshape(dt1_dmu,(Nso)**2)
@@ -358,12 +359,14 @@ def beta_evolve(Tau, TSamps, U, V, OneH, Eri):
     T2 = T2_Decompress(TSamps[1+lent1:],Nso)
     
     dt0_dtau, dt1_dtau, dt2_dtau = fixbetacisd(
-        OneH, Eri, T0, T1, T2, U, V
+        OneH, Eri, 1.0, T1, T2, U, V
     )
 
     dt0_dtau *= -1
     dt1_dtau *= -1
+    dt1_dtau -= dt0_dtau*T1
     dt2_dtau *= -1
+    dt2_dtau -= dt0_dtau*T2
 
     # Reshape the array as vectors and compress to send them out.
     dt1_dtau = np.reshape(dt1_dtau,(Nso)**2)
