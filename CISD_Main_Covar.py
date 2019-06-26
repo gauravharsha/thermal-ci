@@ -587,6 +587,7 @@ def main():
             h1, eri, 1.0, t1, t2, x, y
         )
         en /= ov
+        en += e_nuc
 
         e_cis = np.append( e_cis, en )
         t0_cis = np.append( t0_cis, t0 )
@@ -606,6 +607,7 @@ def main():
             h1, eri, 1.0, t1, t2, x, y
         )
         en /= ov
+        en += e_nuc
 
         e_cisd = np.append( e_cisd, en )
         t0_cisd = np.append( t0_cisd, t0 )

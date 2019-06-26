@@ -1,3 +1,7 @@
+# Input File
+Input
+Input*
+
 # Input Output data files and plots
 *.pdf
 *.h5
