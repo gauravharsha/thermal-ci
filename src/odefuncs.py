@@ -203,18 +203,10 @@ def ci_alpha_evolve(Alpha,Amps,Beta,Fug,eigs):
     # Get the residuals
     r0, r1, r2 = numberci(T1,T2,U,V)
 
-    # Antisymmetrize r2
-    s2 = (
-            r2 \
-            - np.einsum('baij->abij',r2) \
-            - np.einsum('abji->abij',r2) \
-            + np.einsum('baji->abij',r2) \
-        )/4.0
-
     # Compress and concatenate
     dt0_dbeta = r0
     dt1_dbeta = np.reshape( r1, int(NSO**2) )
-    dt2_dbeta = CompressT2( s2 )
+    dt2_dbeta = CompressT2( r2 )
 
     # return concatenated
     return np.concatenate(( [dt0_dbeta], dt1_dbeta, dt2_dbeta ))
@@ -278,9 +270,7 @@ def _do_beta_integration(integrator, amps, betalpha, beta_step, fug, eigs, h1, e
 
     # Extract info
     ci_integrator = integrator
-
     ci_amps = amps
-
     beta_in = betalpha[0]
     alpha_in = betalpha[1]
 
@@ -300,7 +290,6 @@ def _do_alpha_integration(integrator, amps, betalpha, fug, eigs, n_elec, ntol):
     
     # Extract info
     ci_integrator = integrator
-
     ci_amps = amps
 
     beta_in = betalpha[0]
@@ -327,7 +316,7 @@ def _do_alpha_integration(integrator, amps, betalpha, fug, eigs, n_elec, ntol):
     ndiff_sgn = np.sign( num - n_elec )
     ndiff_mag = np.abs( num - n_elec )
 
-    print('Number difference: ',ndiff_sgn,num)
+    print('Number difference: ',ndiff_sgn,ndiff_mag)
 
     # if the number is already converged, then there is no need to do any of the following
     #   and hence we keep an 'if' statement; if the condition evaluates to FALSE, then
@@ -458,6 +447,7 @@ def _do_alpha_integration(integrator, amps, betalpha, fug, eigs, n_elec, ntol):
         ci_amps_out = ci_amps
         mu_mid = alpha_in
 
+    print(num)
     return ci_amps_out, mu_mid
 
 
@@ -510,8 +500,10 @@ class Evolution(IOps):
         self.ci_amps = np.zeros(1+len_t1+len_t2)
 
         # ODE integrators
-        self.ci_beta_integrator = ode(ci_beta_evolve).set_integrator('dopri5',rtol=self.deqtol)
-        self.ci_alpha_integrator = ode(ci_alpha_evolve).set_integrator('dopri5',rtol=self.deqtol)
+        # self.ci_beta_integrator = ode(ci_beta_evolve).set_integrator('dopri5',rtol=self.deqtol)
+        # self.ci_alpha_integrator = ode(ci_alpha_evolve).set_integrator('dopri5',rtol=self.deqtol)
+        self.ci_beta_integrator = ode(ci_beta_evolve).set_integrator('vode', method='bdf', rtol=self.deqtol)
+        self.ci_alpha_integrator = ode(ci_alpha_evolve).set_integrator('vode', method='bdf', rtol=self.deqtol)
 
 
     def setUpInts(self):
@@ -547,10 +539,11 @@ class Evolution(IOps):
         # class level Beta integration function
         # 
 
+        intgrs = self.ci_beta_integrator
+        amps = self.ci_amps
+
         ci_amps = _do_beta_integration(
-            self.ci_beta_integrator, 
-            self.ci_amps,
-            [self.beta_in, self.alpha_in], 
+            intgrs, amps, [self.beta_in, self.alpha_in], 
             self.beta_step, self.fug, self.eigs, self.h1, self.eri
         )
 
@@ -568,7 +561,7 @@ class Evolution(IOps):
         be_al = [self.beta_in, self.alpha_in]
 
         ci_amps, al_mid = _do_alpha_integration(
-            intgrs,amps,be_al, self.fug, self.eigs, self.n_elec, self.ntol
+            intgrs, amps, be_al, self.fug, self.eigs, self.n_elec, self.ntol
         )
 
         self.alpha_in = al_mid

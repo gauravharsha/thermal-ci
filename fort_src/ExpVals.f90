@@ -10,20 +10,20 @@
           Real (Kind=pr)    ::  R0, Ovlp
           Real (Kind=pr)    ::  R1(NA,NA)
           Real (Kind=pr)    ::  R2(NA,NA,NA,NA)
-          Real (Kind=pr)    ::  Amat(NA,NA,NA,NA)
-          Integer :: a, b, c, d
+          !Real (Kind=pr)    ::  Amat(NA,NA,NA,NA)
+          Integer :: a, b, c, d, p, q, r, s
 
-          Real (Kind=pr) :: tau0
-          Real (Kind=pr) :: tau1
-          Real (Kind=pr), dimension(:), allocatable :: tau2
-          Real (Kind=pr) :: tau3
-          Real (Kind=pr) :: tau4
-          Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau5
-          Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau7
-          Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau8
-          Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau9
-          Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau10
-          Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau11
+          !Real (Kind=pr) :: tau0
+          !Real (Kind=pr) :: tau1
+          !Real (Kind=pr), dimension(:), allocatable :: tau2
+          !Real (Kind=pr) :: tau3
+          !Real (Kind=pr) :: tau4
+          !Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau5
+          !Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau7
+          !Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau8
+          !Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau9
+          !Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau10
+          !Real (Kind=pr), dimension(:, :, :, :), allocatable :: tau11
 
           ! Pre Processing
           ! Defining the Hamiltonian Matrix Elements
@@ -73,134 +73,518 @@
           !$omp end do
 
           !$omp single
-          tau0 = Sum(h11*t1)
-          !$omp end single nowait
-
-          !$omp single
-          tau1 = Sum(h221*t2)
-          !$omp end single
-
-          !$omp single
-          tau4 = tau0 + tau1
           
-          allocate(tau2(1:na))
-
-          do a=1, na
-              scr1(a) = t1(a,a)
-          end do
+          R0 = 0.0
           
-          tau2 = y**2 - x*y*scr1
-          R0 = - (tau4/2) - h0/2
-
-          deallocate(tau2)
-
-          tau3 = 0.0_pr
-          tau4 = tau4
-          R1 = tau4*t1/2
-          R2 = tau4*t2/2
-
-          allocate(tau5(1:na, 1:na, 1:na, 1:na))
-          allocate(tau7(1:na, 1:na, 1:na, 1:na))
-          allocate(tau8(1:na, 1:na, 1:na, 1:na))
-          allocate(tau9(1:na, 1:na, 1:na, 1:na))
-          allocate(tau10(1:na, 1:na, 1:na, 1:na))
-          allocate(tau11(1:na, 1:na, 1:na, 1:na))
-
-          tau5 = 0.0_pr
-          tau7 = 0.0_pr
-          tau8 = 0.0_pr
-          tau9 = 0.0_pr
-          tau10 = 0.0_pr
-          tau11 = 0.0_pr
-          Amat = 0.0_pr
           !$omp end single
+          
 
-          !$omp do schedule(static)
+          !$omp do schedule(static) reduction(+:R0)
+          
           do a=1, na
               do b=1, na
-                  Amat(:,:,a,b) = t2(:,a,:,b)
+                  R0 = R0 + ( &
+                      h11(a, b) * t1(a, b)&
+                  )
+              end do
+          end do
+          
+          !$omp end do
+
+          !$omp single
+          
+          
+          R0 = R0 + ( &
+              h0&
+          )
+          
+          
+          !$omp end single
+
+          !$omp do schedule(static) reduction(+:R0)
+          
+          do a=1, na
+              do b=1, na
                   do c=1, na
                       do d=1, na
-                          tau5(a,b,c,d) = tau5(a,b,c,d) + h11(a,b)*t1(c,d)
-                          tau11(a,b,c,d) = delK(a,d)*t1(c,b)-delK(a,b)*t1(c,d)
+                          R0 = R0 + ( &
+                              h221(a, b, c, d) * t2(a, b, c, d)&
+                          )
+                      end do
+                  end do
+              end do
+          end do
+          
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  R1(p, q) = 0.0
+              end do
+          end do
+          !$omp end do
+          
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do a=1, na
+                      do b=1, na
+                          R1(p, q) = R1(p, q) + ( &
+                              h11(a, b) * t2(a, p, b, q)&
+                          )
                       end do
                   end do
               end do
           end do
           !$omp end do
 
-          !$omp single
-          Call A_dot_B(h222,Amat,tau5,na**2,na**2,na**2)
-          !$omp end single nowait
-
-          !$omp single
-          Call A_dot_Btran(h13,t1,tau7,na**3,na,na)
-          !$omp end single nowait
-
-          !$omp single
-          Call A_dot_B(h31,t1,tau8,na**3,na,na)
-          !$omp end single nowait
-
-          !$omp single
-          Call Atran_dot_Btran(-h02,t2,tau9,na,na,na**3)
-          !$omp end single nowait
-
-          !$omp single
-          Call A_dot_B(h20,t2,tau10,na,na,na**3)
-          !$omp end single
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do a=1, na
+                      do b=1, na
+                          R1(p, q) = R1(p, q) + ( &
+                              t1(a, b) * h222(p, q, a, b)&
+                          )
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
 
           !$omp do schedule(static)
-          do b=1, na
-              do a=1, na
-                  R2(a,b,:,:) = R2(a,b,:,:) - (&
-                      tau5(a,:,b,:) - Transpose(tau5(a,:,b,:)) -&
-                      tau5(b,:,a,:) + Transpose(tau5(b,:,a,:))&
-                      )/2 
-                  R2(a,b,:,:) = R2(a,b,:,:) + (&
-                      tau7(b,:,:,a) - tau7(a,:,:,b)&
-                      ) 
-                  R2(a,b,:,:) = R2(a,b,:,:) + (&
-                      tau8(a,b,:,:) - Transpose(tau8(a,b,:,:))&
+          do p=1, na
+              do q=1, na
+          
+                  R1(p, q) = R1(p, q) + ( &
+                      h0 * t1(p, q)&
+                  )
+          
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+          
+                  R1(p, q) = R1(p, q) + ( &
+                      h11(p, q)&
+                  )
+          
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do a=1, na
+                      do b=1, na
+                          do c=1, na
+                              R1(p, q) = R1(p, q) + ( &
+                                  h13(a, b, c, q) * t2(a, p, b, c)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do a=1, na
+                      do b=1, na
+                          do c=1, na
+                              R1(p, q) = R1(p, q) - ( &
+                                  h31(a, b, c, p) * t2(a, b, c, q)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do a=1, na
+                      R1(p, q) = R1(p, q) + ( &
+                          h02(a, q) * t1(p, a)&
                       )
-                  R2(a,b,:,:) = R2(a,b,:,:) - (&
-                      tau9(:,a,b,:) - Transpose(tau9(:,a,b,:))&
-                      )/2
-                  R2(a,b,:,:) = R2(a,b,:,:) - (&
-                      tau10(a,b,:,:) - tau10(b,a,:,:)&
-                      )/2
+                  end do
               end do
           end do
           !$omp end do
-
-          !$omp single
-          Call A_dot_B(-t2,h04,R2,na**2,na**2,na**2)
-          !$omp end single nowait
-
-          !$omp single
-          Call Atran_dot_B(-h40,t2,R2,na**2,na**2,na**2)
-          !$omp end single
-
-          !$omp single
-          deallocate(tau5,tau7,tau8,tau9,tau10,tau11)
-          R1 = R1 - h11/2 - MatMul(t1,h02)/2 - MatMul(Transpose(h20),t1)/2
-          !$omp end single
 
           !$omp do schedule(static)
-          do a=1, na
-              do b=1, na
-                  R1(a,b) = R1(a,b) + Sum(h31(:,:,:,a)*t2(:,:,:,b))/2 &
-                      - Sum(h13(:,:,:,b)*t2(:,a,:,:))/2 &
-                      - Sum(h11*t2(:,a,:,b))/2 &
-                      - Sum(t1*h222(a,b,:,:))/2
+          do p=1, na
+              do q=1, na
+                  do a=1, na
+                      R1(p, q) = R1(p, q) + ( &
+                          h20(a, p) * t1(a, q)&
+                      )
+                  end do
               end do
           end do
           !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          R2(p, q, r, s) = 0.0
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+          
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              do b=1, na
+                                  R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                      h222(p, r, a, b) * t2(a, q, b, s)&
+                                  )
+                              end do
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              do b=1, na
+                                  R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                      h222(q, s, a, b) * t2(a, p, b, r)&
+                                  )
+                              end do
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              do b=1, na
+                                  R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                                      h222(p, s, a, b) * t2(a, q, b, r)&
+                                  )
+                              end do
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              do b=1, na
+                                  R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                                      h222(q, r, a, b) * t2(a, p, b, s)&
+                                  )
+                              end do
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              do b=1, na
+                                  R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                      2 * h04(a, b, r, s) * t2(p, q, a, b)&
+                                  )
+                              end do
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              do b=1, na
+                                  R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                      2 * h40(a, b, p, q) * t2(a, b, r, s)&
+                                  )
+                              end do
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+          
+                          R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                              4 * h221(p, q, r, s)&
+                          )
+          
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+          
+                          R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                              h0 * t2(p, q, r, s)&
+                          )
+          
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+          
+                          R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                              h11(p, r) * t1(q, s)&
+                          )
+          
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+          
+                          R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                              h11(q, s) * t1(p, r)&
+                          )
+          
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+          
+                          R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                              h11(p, s) * t1(q, r)&
+                          )
+          
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+          
+                          R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                              h11(q, r) * t1(p, s)&
+                          )
+          
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                  h02(a, r) * t2(p, q, a, s)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                  h20(a, p) * t2(a, q, r, s)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                                  h02(a, s) * t2(p, q, a, r)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                                  h20(a, q) * t2(a, p, r, s)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                                  2 * t1(a, s) * h31(p, q, r, a)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) - ( &
+                                  2 * t1(p, a) * h13(q, r, s, a)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                  2 * t1(a, r) * h31(p, q, s, a)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
+          !$omp do schedule(static)
+          do p=1, na
+              do q=1, na
+                  do r=1, na
+                      do s=1, na
+                          do a=1, na
+                              R2(p, q, r, s) = R2(p, q, r, s) + ( &
+                                  2 * t1(q, a) * h13(p, r, s, a)&
+                              )
+                          end do
+                      end do
+                  end do
+              end do
+          end do
+          !$omp end do
+
           !$omp end parallel
 
-          R2 = R2 - 2*h221
+
 
           Ovlp = 1.0_pr + Sum(T1*T1) + Sum(T2*T2)/4.0_pr
-          Energy = -2.0_pr*(R0 + Sum(T1*R1) + Sum(T2*R2)/4.0_pr)/Ovlp
+          Energy = (R0 + Sum(T1*R1) + Sum(T2*R2)/4.0_pr)/Ovlp
 
       End Subroutine EvalEnergy
 

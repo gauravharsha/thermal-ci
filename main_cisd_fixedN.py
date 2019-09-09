@@ -42,7 +42,7 @@ def main():
     print('==============================================================')
 
     # Initialize the Evolution module
-    evol = Evolution(inp_file='Input',alpha_step=0.1)
+    evol = Evolution(inp_file='Input',alpha_step=0.05)
 
     # Extract the parameters
     nso = evol.nso
@@ -186,6 +186,8 @@ def main():
         vals = [evol.beta_in, evol.alpha_in, e_ci[i_beta], n_ci[i_beta]]
         evol.updateh5(vals,i_beta)
         fout['ci_amps'][i_beta] = ci_amps
+
+        # exit()
         
     ode_time = time.time()
 
