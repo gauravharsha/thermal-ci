@@ -1,18 +1,17 @@
 import sys
-sys.path.append('./fort_src/')
-sys.path.append('./src/')
-sys.path.append('./input/')
+sys.path.append('../')
 
-import numpy as np, h5py
+import numpy as np, h5py, pdb
 from scipy.integrate import ode
 from scipy.special import comb
 
-from iofuncs import *
-from inttran import *
-from odefuncs import *
+from tfdcisd import *
+# from iofuncs import *
+# from inttran import *
+# from odefuncs import *
 
-from ThermalCISD import *
-from ExpVals import *
+# from ThermalCISD import *
+# from ExpVals import *
 
 #
 # GLOBAL VARIABLES
@@ -41,8 +40,11 @@ def main():
     print('\tReading Input')
     print('==============================================================')
 
+    # Input filename
+    input_file = sys.argv[1]
+
     # Initialize the Evolution module
-    evol = Evolution(inp_file='Input',alpha_step=0.05)
+    evol = Evolution(inp_file=input_file, alpha_step=0.05)
 
     # Extract the parameters
     nso = evol.nso
@@ -105,16 +107,16 @@ def main():
     output_fn = evol.fn.replace('input','output')
     output_fn = output_fn.replace('_data.h5','_tfd_cisd.h5')
 
-    fout = h5py.File(output_fn,'w')
+    # fout = h5py.File(output_fn,'w')
 
     output_dsets = [
         'beta','alpha','e_ci','n_ci'
     ]
 
-    evol.createh5(fout, output_dsets, beta_pts, evol.attrs)
+    # evol.createh5(fout, output_dsets, beta_pts, evol.attrs)
 
     # the amplitudes datasets will have to be handled separately
-    fout.create_dataset('ci_amps',(beta_pts,1+len_t1+len_t2))
+    # fout.create_dataset('ci_amps',(beta_pts,1+len_t1+len_t2))
 
 
     #################################################################
@@ -152,6 +154,7 @@ def main():
     #################################################################
 
     while i_beta < evol.beta_pts-1:
+        pdb.set_trace()
 
         # Beta point index
         i_beta += 1
@@ -184,8 +187,8 @@ def main():
 
         # Write data to the output files
         vals = [evol.beta_in, evol.alpha_in, e_ci[i_beta], n_ci[i_beta]]
-        evol.updateh5(vals,i_beta)
-        fout['ci_amps'][i_beta] = ci_amps
+        # evol.updateh5(vals,i_beta)
+        # fout['ci_amps'][i_beta] = ci_amps
 
         # exit()
         

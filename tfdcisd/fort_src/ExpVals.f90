@@ -578,10 +578,7 @@
               end do
           end do
           !$omp end do
-
           !$omp end parallel
-
-
 
           Ovlp = 1.0_pr + Sum(T1*T1) + Sum(T2*T2)/4.0_pr
           Energy = (R0 + Sum(T1*R1) + Sum(T2*R2)/4.0_pr)/Ovlp

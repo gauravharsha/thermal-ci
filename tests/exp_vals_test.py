@@ -1,15 +1,11 @@
 import sys
-sys.path.append('../src/')
-sys.path.append('../fort_src/')
+sys.path.append('../')
 
 import pytest, h5py, numpy as np
 from scipy.special import comb
 
-from iofuncs import *
-from inttran import *
-from odefuncs import *
+from tfdcisd import *
 
-from ExpVals import *
 
 #########################################################################
 #                                                                       #

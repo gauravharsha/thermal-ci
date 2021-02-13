@@ -7,11 +7,10 @@ from scipy.integrate import ode
 from scipy.special import comb
 from numba import jit, njit
 
-from iofuncs import *
-from inttran import *
-
-from ThermalCISD import *
-from ExpVals import *
+from .iofuncs import *
+from .inttran import *
+from .ThermalCISD import *
+from .ExpVals import *
 
 #
 # GLOBAL VARIABLES
@@ -243,7 +242,7 @@ def eval_energy(OneH, ERI, CI_amps, X, Y):
     T1 = np.reshape(CI_amps[1:Nso*Nso+1], (Nso,Nso))
     T2 = DecompressT2(CI_amps[Nso*Nso+1:], Nso)
 
-    # Number Exp value
+    # en1 /= ov1
     en = evalenergy(OneH, ERI, T1, T2, X, Y)
 
     return en

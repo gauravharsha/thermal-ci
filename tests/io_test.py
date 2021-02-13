@@ -1,11 +1,11 @@
 import sys
-sys.path.append('../src/')
+sys.path.append('../')
 
 import pytest
 import numpy as np
 import h5py
 
-from iofuncs import *
+from tfdcisd import *
 
 #####################################################################
 #                                                                   #
