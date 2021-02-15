@@ -7,9 +7,9 @@ The code is largely written in Python 3.6, however, the essential modules that d
 These Fortran modules are then converted to python modules with the help of the utility `f2py`.
 
 ### Installation
-To compile the Fortran subroutines, the user may either run the bashscript `makemodule` or its variants depending on the platform.
+The installation process is straightforward. First, install the required python packages, listed in `requirements.txt` and then execute
 ```bashscript
-./makemodule
+python3 setup.py install
 ```
 
 ### Using the thermal-ci package

@@ -1,6 +1,3 @@
-import sys
-sys.path.append('../')
-
 import pytest
 import numpy as np
 import h5py

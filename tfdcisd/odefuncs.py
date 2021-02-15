@@ -1,7 +1,4 @@
-import sys
-sys.path.append('../fort_src/')
-
-import h5py, time, numpy as np
+import h5py, numpy as np
 
 from scipy.integrate import ode
 from scipy.special import comb

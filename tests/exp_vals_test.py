@@ -1,6 +1,3 @@
-import sys
-sys.path.append('../')
-
 import pytest, h5py, numpy as np
 from scipy.special import comb
 

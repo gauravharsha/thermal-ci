@@ -10,8 +10,8 @@ cd tfdcisd/fort_src
 #f2py -c --verbose --opt='-O4' -m ExpVals ExpVals.f90 --fcompiler=pg --f90flags="-openmp" -lgomp -lblas
 
 # With openmp
-f2py -c --verbose --opt='-O4' -m ThermalCISD ThermalCISD.f90 --fcompiler=gnu95 --f90flags="-fopenmp" -lgomp -lblas
-f2py -c --verbose --opt='-O4' -m ExpVals ExpVals.f90 --fcompiler=gnu95 --f90flags="-fopenmp" -lgomp -lblas
+f2py -c --verbose --opt='-O4' -m thermalcisd ThermalCISD.f90 --fcompiler=gnu95 --f90flags="-fopenmp" -lgomp -lblas
+f2py -c --verbose --opt='-O4' -m expvals ExpVals.f90 --fcompiler=gnu95 --f90flags="-fopenmp" -lgomp -lblas
 
 # Without openmp
 # f2py -c --verbose --opt='-O4' -m ThermalCISD ThermalCISD.f90 --fcompiler=gnu95 -lblas
