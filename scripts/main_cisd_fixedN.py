@@ -113,10 +113,10 @@ def main():
         'beta','alpha','e_ci','n_ci'
     ]
 
-    # evol.createh5(fout, output_dsets, beta_pts, evol.attrs)
+    evol.createh5(fout, output_dsets, beta_pts, evol.attrs)
 
     # the amplitudes datasets will have to be handled separately
-    # fout.create_dataset('ci_amps',(beta_pts,1+len_t1+len_t2))
+    fout.create_dataset('ci_amps',(beta_pts,1+len_t1+len_t2))
 
 
     #################################################################
@@ -134,7 +134,7 @@ def main():
     vals = [
         evol.beta_in, evol.alpha_in, e_ci[i_beta], n_ci[i_beta]
     ]
-    evol.updateh5(vals,i_beta)
+    evol.updateh5(vals, i_beta)
 
     # The CC and CI amplitudes at initial value are already ZEROS
     
@@ -154,7 +154,6 @@ def main():
     #################################################################
 
     while i_beta < evol.beta_pts-1:
-        pdb.set_trace()
 
         # Beta point index
         i_beta += 1
@@ -187,10 +186,8 @@ def main():
 
         # Write data to the output files
         vals = [evol.beta_in, evol.alpha_in, e_ci[i_beta], n_ci[i_beta]]
-        # evol.updateh5(vals,i_beta)
-        # fout['ci_amps'][i_beta] = ci_amps
-
-        # exit()
+        evol.updateh5(vals, i_beta)
+        fout['ci_amps'][i_beta] = ci_amps
         
     ode_time = time.time()
 
@@ -215,8 +212,6 @@ def main():
     print('Total Time           {}'.format(end_time-start_time))
     print('----------------------------------------------')
     print('----------------------------------------------\n')
-
-
 
     exit()
 
