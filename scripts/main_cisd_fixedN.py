@@ -1,17 +1,5 @@
-import sys
-sys.path.append('../')
-
-import numpy as np, h5py, pdb
-from scipy.integrate import ode
-from scipy.special import comb
-
+import numpy as np, time, sys
 from tfdcisd import *
-# from iofuncs import *
-# from inttran import *
-# from odefuncs import *
-
-# from ThermalCISD import *
-# from ExpVals import *
 
 #
 # GLOBAL VARIABLES
@@ -20,8 +8,6 @@ from tfdcisd import *
 mu_step_0 = +5e-2
 len_t1 = 0
 len_t2 = 0
-
-
 
 
 #
@@ -104,10 +90,10 @@ def main():
     #                   SETUP OUTPUT H5PY FILES                     #
     #################################################################
     
-    output_fn = evol.fn.replace('input','output')
+    output_fn = evol.fn.replace('int_files','output')
     output_fn = output_fn.replace('_data.h5','_tfd_cisd.h5')
 
-    # fout = h5py.File(output_fn,'w')
+    fout = h5py.File(output_fn,'w')
 
     output_dsets = [
         'beta','alpha','e_ci','n_ci'
