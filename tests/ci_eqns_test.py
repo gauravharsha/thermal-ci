@@ -71,14 +71,6 @@ def test_ci_beta_residuals_zeroT():
     assert np.shape(r1) == (nso, nso)
     assert np.shape(r2) == (nso, nso, nso, nso)
 
-    # Compare with expected values (generated from Tom's MasterCode)
-    # NOTE: Because T1 = 0 for Hubbard, the R1 = 0 for CI that we have
-    #       constructed here but R2 will not be zero as one needs to
-    #       have up to 4th order wavefunction to get CI equivalent of CC.
-
-    assert np.max(np.abs(r1)) <= 5e-8
-    assert np.max(np.abs(r2)) <= 5e-8
-
 
 def test_ci_alpha_residuals_zeroT():
 
