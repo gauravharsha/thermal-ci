@@ -1,6 +1,8 @@
 # thermal-ci
 ### Configuration Interaction Theory for Finite Temperature Quantum Chemistry
 
+[![Python application](https://github.com/gauravharsha/thermal-ci/actions/workflows/python-app.yml/badge.svg)](https://github.com/gauravharsha/thermal-ci/actions/workflows/python-app.yml)
+
 Python library for thermofield based finite temperature configuration interaction theory in electronic many-body systems. This library uses the configuration interaction singles and doubles (CISD) theory. The theoretical framework is presented our paper, Thermofield theory for finite temperature quantum chemistry ([arxiv link](https://arxiv.org/abs/1901.06753)).
 
 The code is largely written in Python 3.6, however, the essential modules that drives the imaginary time and chemical potential evolution are generated from drudge in Fortran.
