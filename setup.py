@@ -4,16 +4,14 @@ from numpy.distutils.core import setup, Extension
 thermalcisd = Extension(
     'tfdcisd.ThermalCISD',
     sources=['tfdcisd/fort_src/ThermalCISD.f90', ],
-    f2py_options=['--fcompiler=gnu95'],
-    extra_f90_compile_args=["-O3", "-L/usr/lib/", "-lblas", "-llapack"]
+    extra_f90_compile_args=["-O3", "-lgomp", "-lblas", "-llapack"]
     # extra_f90_compile_args=["-O3", "-fopenmp", "-lgomp", "-lblas"]
 )
 
 expvals = Extension(
     'tfdcisd.ExpVals',
     sources=['tfdcisd/fort_src/ExpVals.f90', ],
-    f2py_options=['--fcompiler=gnu95'],
-    extra_f90_compile_args=["-O3", "-L/usr/lib/", "-lblas", "-llapack"]
+    extra_f90_compile_args=["-O3", "-lgomp", "-lblas", "-llapack"]
     # extra_f90_compile_args=["-O3", "-fopenmp", "-lgomp", "-lblas"]
 )
 
