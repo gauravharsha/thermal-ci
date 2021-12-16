@@ -22,7 +22,7 @@ jobs:
         python-version: "3.9"
     - name: Install BLAS and Fortran
       run: |
-        sudo apt-get install liblapack-dev libblas-dev
+        sudo apt-get install liblapack-dev libblas-dev gfortran gcc
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
