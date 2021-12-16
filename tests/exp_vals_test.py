@@ -1,7 +1,8 @@
-import pytest, h5py, numpy as np
-from scipy.special import comb
-
-from tfdcisd import *
+import pytest
+import numpy as np
+from tfdcisd.iofuncs import IOps
+from tfdcisd.odefuncs import eval_number, eval_energy, CompressT2
+from tfdcisd.ExpVals import evalenergy
 
 
 #########################################################################
@@ -25,9 +26,9 @@ def test_eval_energ_and_num():
     # Construct t1 and t2 = use Tom's MasterCode
     nocc = 6
     t1 = np.loadtxt('T1AMP')
-    t1_pre = np.zeros((nso,nso))
-    t1_pre[:nocc,nocc:] = t1[:,:]
-    t1 = np.einsum('ia->ai',t1_pre)
+    t1_pre = np.zeros((nso, nso))
+    t1_pre[:nocc, nocc:] = t1[:, :]
+    t1 = np.einsum('ia->ai', t1_pre)
 
     t2 = np.loadtxt('T2AMP')
     t2_pre = eri*0
@@ -35,9 +36,9 @@ def test_eval_energ_and_num():
     for i in range(nocc):
         for j in range(nocc):
             for a in range(nocc):
-                t2_pre[i,j,nocc+a,nocc:] = t2[m,:]
+                t2_pre[i, j, nocc+a, nocc:] = t2[m, :]
                 m += 1
-    t2 = np.einsum('ijab->abij',t2_pre)
+    t2 = np.einsum('ijab->abij', t2_pre)
 
     # Other parameters needed for residuals
     y = np.zeros(nso)
@@ -47,10 +48,12 @@ def test_eval_energ_and_num():
 
     # Eval Energy -- directly from fortran routines
     energy_f = evalenergy(h1, eri, t1, t2, x, y)
-    number_f = evalnumber(t1, t2, x, y)
+    number_f = evalenergy(
+        np.eye(nso), np.zeros((nso, nso, nso, nso)), t1, t2, x, y
+    )
 
     # Eval Energy -- from python wrappers
-    ci_amps = np.concatenate(([0],np.reshape(t1,nso**2),CompressT2(t2)))
+    ci_amps = np.concatenate(([0], np.reshape(t1,nso**2), CompressT2(t2)))
 
     energy_p = eval_energy(h1, eri, ci_amps, x, y)
     number_p = eval_number(ci_amps, x, y)
@@ -60,8 +63,8 @@ def test_eval_energ_and_num():
     num_exp = 6.0
 
     # Check
-    assert np.abs( energy_f - en_exp ) < 5e-8
-    assert np.abs( number_f - num_exp ) < 5e-8
-    assert np.abs( energy_p - en_exp ) < 5e-8
-    assert np.abs( number_p - num_exp ) < 5e-8
+    assert np.abs(energy_f - en_exp) < 5e-8
+    assert np.abs(number_f - num_exp) < 5e-8
+    assert np.abs(energy_p - en_exp) < 5e-8
+    assert np.abs(number_p - num_exp) < 5e-8
 
