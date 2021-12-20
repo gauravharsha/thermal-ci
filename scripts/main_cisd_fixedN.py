@@ -3,7 +3,7 @@ import time
 import sys
 from h5py import File
 from scipy.special import comb
-from tfdcisd import Evolution, eval_energy, eval_number
+from tfdcisd.odefuncs import Evolution, eval_energy, eval_number
 
 #
 # GLOBAL VARIABLES
