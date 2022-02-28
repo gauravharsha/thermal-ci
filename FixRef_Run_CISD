@@ -1,9 +1,0 @@
-#!/bin/csh
-
-python3 CISD_Main_Fixed.py
-# python3 plotting.py
-# rm /Output_cisd_fix/*.pdf
-# rm /Output_cisd_fix/*.h5
-# mv *_cisd_*.pdf ./Output_cisd_fix/
-# mv *_cisd_*.h5 ./Output_cisd_fix/
-
